@@ -7,8 +7,8 @@ cssite/secrets.json
 # keygen.py
 
 # test database ignoring
-media/data_original/*.*
-media/data_parsed/*.*
+cssite/media/data_original/*.*
+cssite/media/data_parsed/*.*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
