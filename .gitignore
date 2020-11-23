@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 secrets.json
 
 # Created by https://www.toptal.com/developers/gitignore/api/windows,python,django,vscode
@@ -19,6 +20,10 @@ media
 
 ### Django.Python Stack ###
 # Byte-compiled / optimized / DLL files
+=======
+# Byte-compiled / optimized / DLL files
+__pycache__/
+>>>>>>> 762345bd3d808f199d6f9d631734dade8758164c
 *.py[cod]
 *$py.class
 
@@ -69,12 +74,25 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+<<<<<<< HEAD
 pytestdebug.log
 
 # Translations
 *.mo
 
 # Django stuff:
+=======
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+>>>>>>> 762345bd3d808f199d6f9d631734dade8758164c
 
 # Flask stuff:
 instance/
@@ -85,7 +103,10 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+<<<<<<< HEAD
 doc/_build/
+=======
+>>>>>>> 762345bd3d808f199d6f9d631734dade8758164c
 
 # PyBuilder
 target/
@@ -125,7 +146,10 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+<<<<<<< HEAD
 pythonenv*
+=======
+>>>>>>> 762345bd3d808f199d6f9d631734dade8758164c
 
 # Spyder project settings
 .spyderproject
@@ -144,6 +168,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+<<<<<<< HEAD
 
 # pytype static type analyzer
 .pytype/
@@ -247,3 +272,5 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,python,django,vscode
+=======
+>>>>>>> 762345bd3d808f199d6f9d631734dade8758164c
