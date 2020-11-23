@@ -1,0 +1,13 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+ <title>{% block title %}test task{% endblock %}</title>
+ {% comment %} <link rel="stylesheet" type="text/css" href="{% static 'css/index.css'%}" /> {% endcomment %}
+</head>
+<body>
+ <h1>task page</h1>
+ {% block content %}
+ {% endblock %}
+</body>
+</html>

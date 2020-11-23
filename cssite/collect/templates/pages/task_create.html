@@ -1,0 +1,21 @@
+{% extends 'pages/task.html' %}
+
+{% block title%}
+create task
+{% endblock %}
+
+{% block content %}
+    <h2>Give your task information</h2>
+    <h3>주의: 태스크를 생성할 때는 활성 상태를 체크 해제하고, 속성을 모두 생성한 후에 활성화하세요.</h3>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ create_task_form }}
+        <button type="submit">create</button>
+    </form>
+    <div>
+        <a href="/">
+            go back to index
+        </a>
+    </div>
+{% endblock %}
+

@@ -1,0 +1,64 @@
+{% load static %}
+<head>
+      
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/sign-in/">
+  <link href="../assets/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+  <link rel="stylesheet" href = "{% static 'collect/cover.css' %}">
+  <link rel="stylesheet" href = "{% static 'collect/modal.css' %}">
+  <script src="{% static 'collect/login.js' %}" type="text/javascript"></script>
+</head>
+
+<body class = "text">
+  <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+    <header class="masthead mb-auto">
+      <div class="inner">
+        <h3 class="masthead-brand">데이터베이스</h3>
+        <nav class="nav nav-masthead justify-content-center">
+            <a class="nav-link active" href="{% url 'collect:index' %}">Home</a>
+          <a class="nav-link active" href="{% url 'collect:logout' %}">로그아웃</a>
+          <a class="nav-link active" href="{% url 'collect:update' user.id %}">정보 수정</a>
+          <a class="nav-link active" href="{% url 'collect:delete' user.id %}">회원 탈퇴</a>
+          
+        </nav>
+      </div>
+    </header>
+    
+    <main role="main" class="inner cover">
+        <form action="{% url 'collect:update' user.id %}" method="post">
+            <h2>회원 정보 수정</h2>
+                {% csrf_token %}
+                비밀번호:
+                <input type="password" name="password1"><br>
+                비밀번호 확인:
+                <input type="password" name="password2"><br>
+                이름:
+                <input type="text" name="name"><br>
+                연락처:
+                <input type="text" name="contact"><br>
+                생년월일:
+                <input type="date" name="birth"><br>
+                성별:
+                <select name="gender">
+                    <option value="남성">남성</option>
+                    <option value="여성">여성</option>
+                </select><br>
+                주소:
+                <input type="text" name="address"><br>
+                <input type="submit" value="수정">
+            </form>
+      </main>
+
+  
+  
+    <footer class="mastfoot mt-auto">
+      <div class="inner">
+        <p>김지현 권순석 김하진 이동우 조성현</p>
+      </div>
+    </footer>
+  </div>
+  
+</body> 
+
+  

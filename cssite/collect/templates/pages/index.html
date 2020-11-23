@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+ <title>{% block title %}test{% endblock %}</title>
+ {% comment %} <link rel="stylesheet" type="text/css" href="{% static 'css/index.css'%}" /> {% endcomment %}
+</head>
+<body>
+ <h1>testing index page</h1>
+ {% block content %}
+    <div>
+        <a href="./task">
+            task test session
+        </a>
+    </div>
+    <div>
+        <a href="./upload">
+            file upload test
+        </a>
+    </div>
+    <div>
+        <a href="./list">
+            show all test files
+        </a>
+    </div>
+    <div>
+        <a href="./admin">
+            admin page
+        </a>
+    </div>
+    <div>
+        <a href="./accounts">
+            show all accounts
+        </a>
+    </div>
+ {% endblock %}
+</body>
+</html>

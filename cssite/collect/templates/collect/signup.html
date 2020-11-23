@@ -1,0 +1,30 @@
+<h2>회원가입</h2>
+<strong>{{ error }}</strong>
+<form action="{% url 'collect:signup' %}" method="post">
+    {% csrf_token %}
+    아이디:
+    <input type="text" name="username"><br>
+    비밀번호:
+    <input type="password" name="password1"><br>
+    비밀번호 확인:
+    <input type="password" name="password2"><br>
+    이름:
+    <input type="text" name="name"><br>
+    연락처:
+    <input type="text" name="contact"><br>
+    생년월일:
+    <input type="date" name="birth"><br>
+    성별:
+    <select name="gender">
+        <option value="남성">남성</option>
+        <option value="여성">여성</option>
+    </select><br>
+    주소:
+    <input type="text" name="address"><br>
+    역할:
+    <select name="role">
+        <option value="제출자">제출자</option>
+        <option value="평가자">평가자</option>
+    </select><br><br>
+    <input type="submit" value="회원가입">
+</form>

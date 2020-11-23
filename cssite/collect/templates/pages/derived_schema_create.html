@@ -1,0 +1,20 @@
+{% extends 'pages/task.html' %}
+
+{% block title%}
+create derived schema
+{% endblock %}
+
+{% block content %}
+    <h2>Give your derived schema information</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ create_derived_schema_form }}
+        <button type="submit">create</button>
+    </form>
+    <div>
+        <a href="/">
+            go back to index
+        </a>
+    </div>
+{% endblock %}
+

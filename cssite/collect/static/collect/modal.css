@@ -1,0 +1,153 @@
+/* 모달팝업 */
+.modalInputForm {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 60%;
+  height: 30px;
+
+  margin: 0;
+  padding: 0;
+  text-align: center;
+
+  background-color: #ccc;
+  font-family: "consolas";
+  outline-style: none;
+  border-style: none;
+  border-radius: 5px;
+}
+
+.modalInputDate {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 60%;
+  height: 30px;
+
+  margin: 0;
+  padding: 0;
+  text-align: center;
+
+  background-color: #ccc;
+  font-family: "consolas";
+  outline-style: none;
+  border-style: none;
+  border-radius: 5px;
+}
+
+.modalInputDate::before {
+  content: attr(data-placeholder);
+  width: 100%;
+  text-align: right;
+  color: rgb(114, 114, 114);
+}
+.modalInputDate:focus::before,
+.modalInputDate:valid::before {
+  display: none;
+}
+
+.modalInputRadioDiv {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 60%;
+  height: 30px;
+
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  color: black;
+
+  font-family: "consolas";
+  outline-style: none;
+  border-style: none;
+}
+
+.modalInputSubmit {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 60%;
+  height: 30px;
+
+  margin: 0;
+  padding: 0;
+  text-align: center;
+
+  color: white;
+  background-color: #3472b9;
+  font-family: "consolas";
+  outline-style: none;
+  border-style: none;
+  border-radius: 5px;
+
+  cursor: pointer;
+
+  transition: background-color 0.6s ease;
+}
+
+.modalInputSubmit:hover {
+  background-color: #144680;
+}
+
+div.modalDiv {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+
+  width: 100%;
+  height: 100%;
+
+  background-color: rgba(0, 0, 0, 0.8);
+
+  z-index: +1;
+
+  display: none;
+}
+div.modalInputDiv {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  width: 400px;
+  height: 400px;
+
+  background-color: white;
+}
+p.modalText {
+  position: absolute;
+
+  margin: 0;
+  padding: 0;
+
+  font-family: "consolas";
+  color: black;
+
+  font-size: 28px;
+  text-align: left;
+}
+div.modalExitButton {
+  position: absolute;
+
+  padding: 0;
+  margin: 0;
+
+  width: 20px;
+  height: 20px;
+
+  text-align: center;
+  line-height: 20px;
+  cursor: pointer;
+
+  font-size: 20px;
+
+  color: black;
+  border: 1px solid black;
+}
+/* 순석 추가코드 종료 */

@@ -1,0 +1,21 @@
+{% extends 'pages/task.html' %}
+
+{% block title%}
+create mapping pair
+{% endblock %}
+
+{% block content %}
+    <h2>Give your mapping pair</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ create_mapping_pair_form }}
+        <button type="submit">create</button>
+    </form>
+    {{ list_of_mapping_pairs|linebreaks }}
+    <div>
+        <a href="/">
+            go back to index
+        </a>
+    </div>
+{% endblock %}
+

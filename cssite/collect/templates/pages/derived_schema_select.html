@@ -1,0 +1,23 @@
+{% extends 'pages/task.html' %}
+
+{% block title%}
+{{ schema_name }} @{{ task_name }}
+{% endblock %}
+
+{% block content %}
+    <h2>show information of "{{ schema_name }}" @"{{ task_name }}"</h2>
+    {{ schema_info }}
+    <h3>list of mapping pairs</h3>
+    {{ mapping_pairs|linebreaks }}
+    <div>
+        <a href="/">
+            go back to index
+        </a>
+    </div>
+    <div>
+        <a href="./pair">
+            manage mapping pairs
+        </a>
+    </div>
+{% endblock %}
+

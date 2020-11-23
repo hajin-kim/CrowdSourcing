@@ -1,0 +1,22 @@
+{% extends 'pages/task.html' %}
+
+{% block title%}
+list tasks
+{% endblock %}
+
+{% block content %}
+    <h2>task list</h2>
+    <h3>tasks</h3>
+    {{ list_of_tasks|linebreaks }}
+    <div>
+        <a href="/">
+            go back to index
+        </a>
+    </div>
+    <div>
+        <a href="./create">
+            create task
+        </a>
+    </div>
+{% endblock %}
+
