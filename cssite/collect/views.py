@@ -50,6 +50,8 @@ def signup(request):
                 return redirect(reverse('collect:submitter'))
             elif account.role == '평가자':
                 return redirect(reverse('collect:grader'))
+            elif account.role == '관리자':
+                return redirect(reverse('pages:list'))
         else:
             context.update({'error': "비밀번호가 일치하지 않습니다."})
     return render(request, 'collect/signup.html', context)
@@ -68,6 +70,8 @@ def login(request):
                 return redirect(reverse('collect:submitter'))
             elif user.account.role == '평가자':
                 return redirect(reverse('collect:grader'))
+            elif user.account.role == '관리자':
+                return redirect(reverse('collect:manager'))
         messages.error(request, '로그인 실패. 다시 시도 해보세요.')
         return render(request, 'collect/login.html')
     else:
@@ -291,6 +295,10 @@ def grader(request):
     return render(request, 'collect/grader.html')
 
 
+def manager(request):
+    return render(request, 'collect/manager.html')
+
+
 def uploadFile(request):
     """
     docstring
@@ -424,7 +432,7 @@ def listTasks(request):
     """
     docstring
     """
-    tasks = generateListString(Task.objects.values())
+    tasks = Task.objects.values()
     return render(request, 'pages/task_list.html', {
         'list_of_tasks': tasks,
     })
@@ -508,9 +516,10 @@ def createAttribute(request, task_id):
     task = Task.objects.filter(id=task_id)[0]
     attribute = None
 
+    '''
     if task.activation_state:
         return HttpResponse("<h2>태스크가 활성화되어 있습니다!</h3>")
-
+    '''
     attributes = generateListString(SchemaAttribute.objects.filter(task=task))
 
     if request.method == 'POST':
@@ -542,8 +551,10 @@ def listDerivedSchemas(request, task_id):
     docstring
     """
     task = Task.objects.filter(id=task_id)[0]
-    derived_schemas = generateListString(MappingInfo.objects.filter(task=task))
+
+    derived_schemas = MappingInfo.objects.filter(task=task)
     return render(request, 'pages/derived_schema_list.html', {
+        'task_id': task_id,
         'task_name': task.name,
         'list_of_derived_schemas': derived_schemas,
     })

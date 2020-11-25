@@ -1,5 +1,4 @@
 {% load static %}
-
 <head>
       
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -22,20 +21,17 @@
             <a class="nav-link active" href="{% url 'collect:update' user.id %}">정보 수정</a>
             <a class="nav-link active" href="{% url 'collect:userinfo' user.id %}">내 정보 조회</a>
             <a class="nav-link active" href="{% url 'collect:users' %}">유저 정보 조회</a>
+            <a class="nav-link active" href="{% url 'list tasks' %}">태스크 목록</a>
             <a class="nav-link active" href="{% url 'create task' %}">태스크 생성하기</a>
         </nav>
       </div>
     </header>
-    <main role="main" class="inner cover">     
-        <h2>list attributes of "{{ task_name }}"</h2>
-        {{ list_of_attributes|linebreaks }}
-
-        <div>
-            <a href="./create">
-                create_attribute
-            </a>
-        </div>
+    <main role="main" class="inner cover">
+      <h1 class="cover-heading">관리자로 로그인되셨습니다.</h1>
+      
     </main>
+
+  
 
       <footer class="mastfoot mt-auto">
         <div class="inner">
@@ -45,10 +41,3 @@
     </div>
     
   </body> 
-
-
-
-
-
-
-

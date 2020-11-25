@@ -19,6 +19,8 @@ urlpatterns = [
     path('tasks/', views.TaskList.as_view(), name='tasks'),
     path('grader/', views.grader, name='grader'),
     path('submitter/', views.submitter, name='submitter'),
+
+    path('manager/', views.manager, name='manager'),
     path('tasks/<int:pk>/', views.TaskDetail.as_view(), name='task-detail'),
     path('participations/', views.ParticipationList.as_view(), name='participations'),
     path('tasks/<int:pk>/create/', views.create_participation,
