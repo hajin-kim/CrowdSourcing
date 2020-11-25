@@ -91,10 +91,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
-<<<<<<< HEAD
 doc/_build/
-=======
->>>>>>> 762345bd3d808f199d6f9d631734dade8758164c
 
 # PyBuilder
 target/
@@ -134,10 +131,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-<<<<<<< HEAD
 pythonenv*
-=======
->>>>>>> 762345bd3d808f199d6f9d631734dade8758164c
 
 # Spyder project settings
 .spyderproject
@@ -156,7 +150,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-<<<<<<< HEAD
 
 # pytype static type analyzer
 .pytype/
@@ -260,5 +253,4 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,python,django,vscode
-=======
->>>>>>> 762345bd3d808f199d6f9d631734dade8758164c
+
