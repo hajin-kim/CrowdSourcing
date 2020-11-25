@@ -1,0 +1,13 @@
+{% extends 'collect/manager.html' %}
+
+{% block main_content %}
+  <h2>Give your attribute</h2>
+  <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ create_attribute_form }}
+      <button type="submit">create</button>
+  </form>
+  {{ list_of_attributes|linebreaks }}
+{% endblock main_content %}
+
+  

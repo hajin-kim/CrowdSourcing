@@ -1,40 +1,8 @@
-
-{% load static %}
-<head>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
-  <link rel="stylesheet" href = "{% static 'collect/cover.css' %}">
-</head>
-<body>
-    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
-        <header class="masthead mb-auto">
-            <div class="inner">
-                <h4 class="masthead-brand">데이터베이스</h4>
-                <class class="nav nav-masthead justify-content-center">
-                    <a class="nav-link active" href="{% url 'collect:submitter' %}">Home</a>
-                    <a class="nav-link active" href="{% rul 'collect:participation' %}">태스크 참여하기</a>
-                    <a class="nav-link active" href="{% rul 'collect:submitted_parsedfile' %}">내가 제출한 파일 목록</a>
-                    <a class="nav-link active" href="{% url 'collect:index' %}">로그아웃</a>
-                    </nav>
-            </div>
-        </header>
-
-        <main role="main" class="inner cover">
-            <h1>태스크 정보</h1>
-            <p>태스크 이름: {{ task.name }}</p>
-            <p>최소 업로드 주기: {{ task.minimal_upload_frequency }}</p>
-            <p>태스크 설명: {{ task.description }}</p>
-            <p>원본 데이터 설명: {{ task.original_data_description }}</p>
-
-        </main>
-
-        <footer class="mastfoot mt-auto">
-            <div class="inner">
-                <p>김지현 권순석 김하진 이동우 조성현</p>
-            </div>
-        </footer>
-    </div>
-
-
-</body>
-
-
+{% extends 'collect/submitter.html' %}
+{% block main_content %}
+    <h1>태스크 정보</h1>
+    <p>태스크 이름: {{ task.name }}</p>
+    <p>최소 업로드 주기: {{ task.minimal_upload_frequency }}</p>
+    <p>태스크 설명: {{ task.description }}</p>
+    <p>원본 데이터 설명: {{ task.original_data_description }}</p>
+{% endblock main_content %}

@@ -1,0 +1,13 @@
+{% extends 'collect/manager.html' %}
+
+{% block main_content %}
+  <h2>매핑 정보 생성</h2>
+  <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ create_mapping_pair_form }}
+      <button type="submit">생성</button>
+  </form>
+  {{ list_of_mapping_pairs|linebreaks }}
+{% endblock main_content %}
+
+

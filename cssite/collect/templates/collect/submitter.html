@@ -24,7 +24,10 @@
         </header>
 
         <main role="main" class="inner cover">
-            <h1 class="cover-heading">제출자로 로그인하셨습니다.</h1>
+            {% block main_content %}
+                <h1 class="cover-heading">제출자로 로그인하셨습니다.</h1>
+            {% endblock main_content %}
+
       
         </main>
 

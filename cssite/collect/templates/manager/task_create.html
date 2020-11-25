@@ -1,0 +1,14 @@
+{% extends 'collect/manager.html' %}
+
+{% block main_content %}
+  <h2>태스크 생성</h2>
+  <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ create_task_form }}
+      <button type="submit">생성</button>
+  </form>
+{% endblock main_content %}
+
+
+  
+

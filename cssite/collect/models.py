@@ -27,13 +27,13 @@ class Account(models.Model):
     role = models.CharField('역할', max_length=10, choices=ROLE_CHOICES)
 
     def __str__(self):
-        return self.role
+        return self.user.username
 
 
 class Task(models.Model):
     name = models.CharField('태스크 이름', max_length=45, unique=True)
     minimal_upload_frequency = models.CharField('최소 업로드 주기', max_length=45)
-    activation_state = models.BooleanField('활성화 상태', default=True)
+    activation_state = models.BooleanField('활성화 상태', default=False)
     description = models.CharField('태스크 설명', max_length=100)
     original_data_description = models.CharField('원본 데이터 설명', max_length=100)
 
@@ -51,6 +51,9 @@ class Participation(models.Model):
                              related_name='participations', verbose_name='태스크')
     admission = models.BooleanField('승인 상태', default=False)
     submit_count = models.IntegerField('제출 횟수', default=0)
+
+    def __str__(self):
+        return "\"" + self.account.__str__() + "\" parts in \"" + self.task.__str__() + "\""
 
 
 def grading_score_validator(value):

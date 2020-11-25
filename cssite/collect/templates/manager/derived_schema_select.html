@@ -1,0 +1,17 @@
+{% extends 'collect/manager.html' %}
+
+{% block main_content %}
+  <h2>"{{ schema_name }}" @"{{ task_name }}"</h2>
+  {{ schema_info }}
+  <h3>매핑 정보 목록</h3>
+  {{ mapping_pairs|linebreaks }}
+
+  <div>
+      <a href="./pair">
+          매핑 정보 관리
+      </a>
+  </div>
+{% endblock main_content %}
+
+
+

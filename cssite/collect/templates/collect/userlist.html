@@ -1,5 +1,15 @@
+{% extends 'collect/manager.html' %}
 
-{% load static %}
+                                      {% comment %} 
+
+TODO:
+관리자 페이지 헤더 통일하려고 상속으로 변경했습니다.
+주석처리한 부분은 확인 후 지워주세요.
+H.K.
+
+                                      {% endcomment %}
+
+{% comment %} {% load static %}
 <head>
       
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -27,52 +37,55 @@
       </div>
     </header>
 
-    <main role="main" class="inner cover">
+    <main role="main" class="inner cover"> {% endcomment %}
        
-        <form action="{% url 'collect:users' %}" method="get">
-            아이디:
-            <input type="text" name="username">
-            성별:
-            <select name="gender">
-                <option value="">--</option>
-                <option value="남성">남성</option>
-                <option value="여성">여성</option>
-            </select>
-            역할:
-            <select name="role">
-                <option value="">--</option>
-                <option value="제출자">제출자</option>
-                <option value="평가자">평가자</option>
-            </select>
-            생년월일:
-            <input type="date" name="birth1"> ~ <input type="date" name="birth2">
-            참여 태스크:
-            <select name="taskname">
-                <option value="">--</option>
-                {% for task in tasks %}
-                <option value="{{ task.name }}">{{ task.name }}</option>
-                {% endfor %}
-            </select>
-            <input type="submit" value="검색">
-        </form>
+{% block main_content %}
+  <form action="{% url 'collect:users' %}" method="get">
+      아이디:
+      <input type="text" name="username">
+      성별:
+      <select name="gender">
+          <option value="">--</option>
+          <option value="남성">남성</option>
+          <option value="여성">여성</option>
+      </select>
+      역할:
+      <select name="role">
+          <option value="">--</option>
+          <option value="제출자">제출자</option>
+          <option value="평가자">평가자</option>
+      </select>
+      생년월일:
+      <input type="date" name="birth1"> ~ <input type="date" name="birth2">
+      참여 태스크:
+      <select name="taskname">
+          <option value="">--</option>
+          {% for task in tasks %}
+          <option value="{{ task.name }}">{{ task.name }}</option>
+          {% endfor %}
+      </select>
+      <input type="submit" value="검색">
+  </form>
 
-        역할 ID 생년월일 성별 참여중인태스크 상세조회
-        <ul>
-            {% for account in accounts %}
-                {% if account.role != "관리자" %}
-                    <li>
-                    {{ account.role }} {{ account.user.username }} {{ account.birth }} {{ account.gender }}
-                    {% for participation in account.participations.all %}
-                        {% if participation.admission %}
-                            {{ participation.task.name }} 
-                        {% endif %}
-                    {% endfor %}
-                    <a href="{% url 'collect:user-detail' account.user.id %}">상세조회</a>
-                    </li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-
+  역할 ID 생년월일 성별 참여중인태스크 상세조회
+  <ul>
+      {% for account in accounts %}
+          {% if account.role != "관리자" %}
+              <li>
+              {{ account.role }} {{ account.user.username }} {{ account.birth }} {{ account.gender }}
+              {% for participation in account.participations.all %}
+                  {% if participation.admission %}
+                      {{ participation.task.name }} 
+                  {% endif %}
+              {% endfor %}
+              <a href="{% url 'collect:user-detail' account.user.id %}">상세조회</a>
+              </li>
+          {% endif %}
+      {% endfor %}
+  </ul>
+{% endblock main_content %}
+        
+{% comment %} 
     </main>
 
   
@@ -84,7 +97,7 @@
       </footer>
     </div>
     
-  </body> 
+  </body>  {% endcomment %}
 
 
 

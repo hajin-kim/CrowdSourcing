@@ -6,7 +6,18 @@
 a,
 a:focus,
 a:hover {
-  color: black;
+  color: gold;
+  font-weight: bold;
+}
+
+
+hr{
+  color: white;
+  background-color: white;
+}
+hr::after {
+  color: white;
+  background-color: white;
 }
 
 /* Custom default button */

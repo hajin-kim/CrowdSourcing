@@ -21,7 +21,7 @@ def fileList(request):
     """
     docstring
     """
-    return render(request, 'pages/list.html', {
+    return render(request, 'manager/list.html', {
         'files': str(list(OriginFile.objects.values())),
         'files_parsed': str(list(ParsedFile.objects.values())),
     })
@@ -51,7 +51,7 @@ def signup(request):
             elif account.role == '평가자':
                 return redirect(reverse('collect:grader'))
             elif account.role == '관리자':
-                return redirect(reverse('pages:list'))
+                return redirect(reverse('manager:list'))
         else:
             context.update({'error': "비밀번호가 일치하지 않습니다."})
     return render(request, 'collect/signup.html', context)
@@ -164,17 +164,31 @@ class ParticipationList(View):
         return render(request, 'collect/participation.html', {'participations': participations})
 
 
+
 # 태스크 참여 취소, 관리자 승인
 def delete_participation(request, pk):
-    if request.user.is_superuser:
-        participation = get_object_or_404(Participation, pk=pk)
-        participation.admission = True
-        participation.save()
-        return redirect(reverse('collect:users'))
-    else:
+    if not request.user.is_superuser:
         participation = get_object_or_404(Participation, pk=pk)
         participation.delete()
         return redirect(reverse('collect:participations'))
+
+
+# 태스크 관리자 승인
+def manager_acknowledge_participation(request, part_id):
+    if request.user.is_superuser:
+        task = Participation.objects.filter(id=part_id)[0].task
+        participation = get_object_or_404(Participation, pk=part_id)
+        participation.admission = True
+        participation.save()
+        return redirect(reverse('show task', kwargs={'task_id': task.id}))
+
+# 태스크 참여 취소, 관리자 승인
+def manager_delete_participation(request, part_id):
+    if request.user.is_superuser:
+        task = Participation.objects.filter(id=part_id)[0].task
+        participation = get_object_or_404(Participation, pk=part_id)
+        participation.delete()
+        return redirect(reverse('show task', kwargs={'task_id': task.id}))
 
 
 # 제출한 파일 목록
@@ -406,7 +420,7 @@ def uploadFile(request):
         # TODO: Return 부분 수정해야함
         return redirect('list files')
 
-    return render(request, 'pages/upload.html', {
+    return render(request, 'manager/upload.html', {
         'file_upload_form': form
     })
 
@@ -433,7 +447,7 @@ def listTasks(request):
     docstring
     """
     tasks = Task.objects.values()
-    return render(request, 'pages/task_list.html', {
+    return render(request, 'manager/task_list.html', {
         'list_of_tasks': tasks,
     })
 
@@ -445,11 +459,17 @@ def showTask(request, task_id):
     task = Task.objects.filter(id=task_id)[0]
     attributes = generateListString(SchemaAttribute.objects.filter(task=task))
     derived_schemas = generateListString(MappingInfo.objects.filter(task=task))
-    return render(request, 'pages/task_select.html', {
-        'task_name': task.name,
+
+    part_in = Participation.objects.filter(task=task, admission=True)
+    applied = Participation.objects.filter(task=task, admission=False)
+
+    return render(request, 'manager/task_select.html', {
+        'task': task,
         'task_info': str(list(Task.objects.filter(id=task_id).values())),
         'task_attributes': attributes,
         'task_derived_schemas': derived_schemas,
+        'part_in': part_in,
+        'applied': applied,
     })
 
 
@@ -468,7 +488,7 @@ def createTask(request):
             # task.activation_state = True
             task.save()
 
-            # return render(request, 'pages/done_task.html', {})
+            # return render(request, 'manager/done_task.html', {})
             return redirect('list tasks')
     else:
         form = CreateTask()
@@ -486,7 +506,7 @@ def createTask(request):
     #     original_data_description=original_data_description
     # )
 
-    return render(request, 'pages/task_create.html', {
+    return render(request, 'manager/task_create.html', {
         'create_task_form': form
     })
 
@@ -502,7 +522,7 @@ def listAttributes(request, task_id):
     """
     task = Task.objects.filter(id=task_id)[0]
     attributes = generateListString(SchemaAttribute.objects.filter(task=task))
-    return render(request, 'pages/attribute_list.html', {
+    return render(request, 'manager/attribute_list.html', {
         'task_name': task.name,
         'list_of_attributes': attributes,
     })
@@ -516,10 +536,10 @@ def createAttribute(request, task_id):
     task = Task.objects.filter(id=task_id)[0]
     attribute = None
 
-    '''
-    if task.activation_state:
-        return HttpResponse("<h2>태스크가 활성화되어 있습니다!</h3>")
-    '''
+    
+    # if task.activation_state:
+    #     return HttpResponse("<h2>태스크가 활성화되어 있습니다!</h3>")
+    
     attributes = generateListString(SchemaAttribute.objects.filter(task=task))
 
     if request.method == 'POST':
@@ -535,7 +555,7 @@ def createAttribute(request, task_id):
     else:
         form = CreateSchemaAttribute()
 
-    return render(request, 'pages/attribute_create.html', {
+    return render(request, 'manager/attribute_create.html', {
         'create_attribute_form': form,
         'list_of_attributes': attributes,
     })
@@ -553,7 +573,7 @@ def listDerivedSchemas(request, task_id):
     task = Task.objects.filter(id=task_id)[0]
 
     derived_schemas = MappingInfo.objects.filter(task=task)
-    return render(request, 'pages/derived_schema_list.html', {
+    return render(request, 'manager/derived_schema_list.html', {
         'task_id': task_id,
         'task_name': task.name,
         'list_of_derived_schemas': derived_schemas,
@@ -570,7 +590,7 @@ def showDerivedSchema(request, task_id, schema_id):
     schema_info = MappingInfo.objects.filter(id=schema_id).values()[0]
     mapping_pairs = generateListString(
         MappingPair.objects.filter(mapping_info=schema))
-    return render(request, 'pages/derived_schema_select.html', {
+    return render(request, 'manager/derived_schema_select.html', {
         'task_name': task.name,
         'schema_name': schema.derived_schema_name,
         'schema_info': schema_info,
@@ -598,7 +618,7 @@ def createDerivedSchema(request, task_id):
     else:
         form = CreateMappingInfo()
 
-    return render(request, 'pages/derived_schema_create.html', {
+    return render(request, 'manager/derived_schema_create.html', {
         'create_derived_schema_form': form
     })
 
@@ -617,7 +637,7 @@ def listMappingPairs(request, task_id, schema_id):
 
     mapping_pairs = generateListString(
         MappingPair.objects.filter(mapping_info=derived_schema))
-    return render(request, 'pages/mapping_pair_list.html', {
+    return render(request, 'manager/mapping_pair_list.html', {
         'task_name': task.name,
         'schema_name': derived_schema.derived_schema_name,
         'list_of_mapping_pairs': mapping_pairs,
@@ -649,7 +669,7 @@ def createMappingPair(request, task_id, schema_id):
     else:
         form = CreateMappingPair()
 
-    return render(request, 'pages/mapping_pair_create.html', {
+    return render(request, 'manager/mapping_pair_create.html', {
         'create_mapping_pair_form': form,
         'list_of_mapping_pairs': mapping_pairs,
     })

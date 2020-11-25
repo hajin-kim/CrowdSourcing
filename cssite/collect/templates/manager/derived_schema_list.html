@@ -1,0 +1,20 @@
+{% extends 'collect/manager.html' %}
+
+{% block main_content %}
+  <h2>파생 스키마 목록 of "{{ task_name }}"</h2>
+  {% for schema in list_of_derived_schemas %}
+  <h4>{{schema.derived_schema_name}}</h4>
+  <a href = "{% url 'show derived schema' task_id schema.id %}"><button>상세 조회</button></a><br>
+  <hr>
+
+  {% endfor %}
+
+  <div>
+      <a href="./create">
+          파생 스키마 생성
+      </a>
+  </div>
+{% endblock main_content %}
+
+
+

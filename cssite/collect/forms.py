@@ -32,7 +32,7 @@ class UploadForm(forms.ModelForm):
     class Meta:
         model = OriginFile
         # fields = {'name', 'data'}
-        fields = {'derived_schema', 'file_original'}
+        fields = ['derived_schema', 'file_original']
 
     def save(self, commit=True):
         self.instance = OriginFile(**self.cleaned_data)
@@ -51,13 +51,12 @@ class CreateTask(forms.ModelForm):
     class Meta:
         model = Task
         # fields = {'name', 'data'}
-        fields = {
+        fields = [
             'name',
             'minimal_upload_frequency',
-            'activation_state',
             'description',
             'original_data_description',
-        }
+        ]
 
     def save(self, commit=True):
         self.instance = Task(**self.cleaned_data)
@@ -75,9 +74,9 @@ class CreateSchemaAttribute(forms.ModelForm):
     """
     class Meta:
         model = SchemaAttribute
-        fields = {
+        fields = [
             'attr',
-        }
+        ]
 
     def save(self, task, commit=True):
         self.instance = SchemaAttribute(**self.cleaned_data)
@@ -97,9 +96,9 @@ class CreateMappingInfo(forms.ModelForm):
     class Meta:
         model = MappingInfo
         # fields = {'name', 'data'}
-        fields = {
+        fields = [
             'derived_schema_name',
-        }
+        ]
 
     def save(self, task, commit=True):
         self.instance = MappingInfo(**self.cleaned_data)
@@ -118,11 +117,11 @@ class CreateMappingPair(forms.ModelForm):
     """
     class Meta:
         model = MappingPair
-        fields = {
+        fields = [
             # 'mapping_info',
             'schema_attribute',
             'parsing_column_name',
-        }
+        ]
 
     def save(self, mapping_info, commit=True):
         self.instance = MappingPair(**self.cleaned_data)
