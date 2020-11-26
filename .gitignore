@@ -1,4 +1,17 @@
+# MacOS .DS_Store file
+*.DS_Store
+
+# keys ignoring
+# TODO: if development is done, hide this key for publishing
+cssite/secrets.json
+# keygen.py
+
+# test database ignoring
+cssite/media/*
+
+
 cssite/cssite/secrets.json
+cssite/collect/migrations/*
 
 # Created by https://www.toptal.com/developers/gitignore/api/windows,python,django,vscode
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,python,django,vscode
@@ -19,7 +32,7 @@ media
 
 ### Django.Python Stack ###
 # Byte-compiled / optimized / DLL files
-__pycache__/
+cssite/__pycache__/
 *.py[cod]
 *$py.class
 
