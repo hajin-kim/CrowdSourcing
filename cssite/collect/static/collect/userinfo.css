@@ -1,0 +1,47 @@
+  .titleText {
+    color : white;
+    font-size : 32px;
+    text-align : center;
+  }
+  
+  .userInfoDiv {
+    max-width : 600px;
+    height : 400px;
+    margin: 0 auto;
+  }
+  
+  .userInfoSubDiv {
+    position : relative;
+    top : 50px;
+    height : 280px;
+  }
+  
+  .userInfoSubText {
+    position:absolute;
+    left : 30%;
+    color : white;
+    font-size : 16px;
+    text-align : left;
+  }
+  
+  .userInfoTextForm {
+    position: absolute;
+    right : 25%;
+  
+    width: 30%;
+    height: 30px;
+  
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    
+    line-height : 30px;
+    color : black;
+
+    background-color:white;
+    font-family: "consolas";
+    outline-style: none;
+    border-style: none;
+    border-radius: 5px;
+  }
+  
