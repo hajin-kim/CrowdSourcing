@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Account, Task, ParsedFile, Participation, MappingInfo, OriginFile, SchemaAttribute, MappingPair
+from .models import Account, Task, Participation, MappingInfo, SchemaAttribute, MappingPair, ParsedFile
 
 
 class LoginForm(forms.ModelForm):
@@ -30,15 +30,15 @@ class UploadForm(forms.ModelForm):
     docstring
     """
     class Meta:
-        model = OriginFile
+        model = ParsedFile
         # fields = {'name', 'data'}
-        fields = ['derived_schema', 'file_original']
+        fields = ['derived_schema', 'file_original', 'start_date', 'end_date']
 
     def save(self, commit=True):
-        self.instance = OriginFile(**self.cleaned_data)
+        self.instance = ParsedFile(**self.cleaned_data)
 
-        if commit:
-            self.instance.save()
+        # if commit:
+        #     self.instance.save()
             # self.instance.name = self.instance.file_original.name
             # self.instance.save()
         return self.instance

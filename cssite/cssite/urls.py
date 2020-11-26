@@ -18,13 +18,10 @@ from django.urls import path, include
 from collect.views import *
 
 urlpatterns = [
-    path('', index),
+    path('', index, name='index'),
 
     path('admin/', admin.site.urls),
     path('collect/', include('collect.urls')),
-
-    path('upload/', uploadFile, name='upload file'),
-    path('list/', fileList, name='list files'),
 
     path('task/', listTasks, name='list tasks'),
     path('task/<int:task_id>/', showTask, name='show task'),

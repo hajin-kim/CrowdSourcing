@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.views import generic, View
 from django.contrib import auth, messages
 from django.contrib.auth.models import User
-from .models import Account, Task, Participation, ParsedFile, SchemaAttribute, MappingInfo, MappingPair, OriginFile
+from .models import Account, Task, Participation, ParsedFile, SchemaAttribute, MappingInfo, MappingPair
 from .forms import LoginForm, GradeForm, SchemaChoiceForm, UploadForm, CreateTask, CreateSchemaAttribute, CreateMappingInfo, CreateMappingPair
 from datetime import date, datetime
 import os
@@ -14,7 +14,22 @@ from django.conf import settings
 
 # 홈
 def index(request):
-    return render(request, 'collect/index.html')
+    # if request.user.:
+    #     return render(request, 'collect/index.html')
+    if not request.user.is_authenticated:
+        return render(request, 'collect/index.html')
+    user = Account.objects.filter(user=request.user)[0]
+    if user.role == "제출자":
+        return redirect(reverse('collect:submitter'))
+    elif user.role == "평가자":
+        return redirect(reverse('collect:grader'))
+    elif user.role == "관리자":
+        return redirect(reverse('collect:manager'))
+
+        
+
+
+    
 
 
 def fileList(request):
@@ -22,7 +37,7 @@ def fileList(request):
     docstring
     """
     return render(request, 'manager/list.html', {
-        'files': str(list(OriginFile.objects.values())),
+        'files': str(list(ParsedFile.objects.values())),
         'files_parsed': str(list(ParsedFile.objects.values())),
     })
 
@@ -165,7 +180,7 @@ class ParticipationList(View):
 
 
 
-# 태스크 참여 취소, 관리자 승인
+# 제출자: 태스크 참여 취소
 def delete_participation(request, pk):
     if not request.user.is_superuser:
         participation = get_object_or_404(Participation, pk=pk)
@@ -173,7 +188,7 @@ def delete_participation(request, pk):
         return redirect(reverse('collect:participations'))
 
 
-# 태스크 관리자 승인
+# 관리자: 태스크 참여 승인
 def manager_acknowledge_participation(request, part_id):
     if request.user.is_superuser:
         task = Participation.objects.filter(id=part_id)[0].task
@@ -182,7 +197,7 @@ def manager_acknowledge_participation(request, part_id):
         participation.save()
         return redirect(reverse('show task', kwargs={'task_id': task.id}))
 
-# 태스크 참여 취소, 관리자 승인
+# 관리자: 태스크 참여 거절
 def manager_delete_participation(request, part_id):
     if request.user.is_superuser:
         task = Participation.objects.filter(id=part_id)[0].task
@@ -192,19 +207,119 @@ def manager_delete_participation(request, part_id):
 
 
 # 제출한 파일 목록
-class ParsedfileList(View):
-    def get(self, request, pk):
-        user = request.user
-        task = get_object_or_404(Task, pk=pk)
-        parsedfile_list = user.account.parsed_submits.filter(task=task)
-        total_tuple = sum(
-            parsedfile.total_tuple for parsedfile in parsedfile_list)
-        context = {
-            'task': task,
-            'parsedfile_list': parsedfile_list,
-            'total_tuple': total_tuple
-        }
-        return render(request, 'collect/submitted_parsedfile.html', context)
+def parsedFileListAndUpload(request, pk):
+    os.makedirs(settings.JOINED_PATH_DATA_ORIGINAL, exist_ok=True)
+    os.makedirs(settings.JOINED_PATH_DATA_PARSED, exist_ok=True)
+
+    user = request.user
+    task = get_object_or_404(Task, pk=pk)
+
+    form = None
+    if request.method == 'POST':
+        form = UploadForm(request.POST, request.FILES)
+        # schema_choice_form = SchemaChoiceForm(request.POST, request.FILES)
+        if form.is_valid():
+            # TODO: 이 부분 구현해야 합니다!
+            # 각 릴레이션의 튜풀을 받아야 합니다.
+            # 이런 식으로요:
+            # task = Task.objects.filter(***)[0]
+            # 아마 key 등을 이 함수의 파라미터를 통해 받아오는 방법 등을 택할 것 같네요.
+            grader_pk = 2
+            
+            submitter = Account.objects.filter(user=user)[0]
+            grader = Account.objects.filter(id=grader_pk)[0]
+
+            # form = form.save(commit=False) # 중복 DB save를 방지
+            parsedFile = form.save()
+            parsedFile.task = task
+            parsedFile.submitter = submitter
+            parsedFile.grader = grader
+            parsedFile.save()
+
+            derived_schema = parsedFile.derived_schema
+            original_file_path = os.path.join(settings.MEDIA_ROOT, 
+                parsedFile.file_original.name)
+
+            # print(saved_original_file.get_absolute_path(), "###")
+            # load csv file from the server
+            df = pd.read_csv(original_file_path)
+
+            # get DB tuples
+            mapping_info = MappingInfo.objects.filter(
+                task=task,
+                derived_schema_name=derived_schema
+            )[0]
+            # get parsing information into a dictionary
+            # { 파싱전: 파싱후 }
+            mapping_from_to = {
+                i.parsing_column_name: i.schema_attribute.attr
+                for i in MappingPair.objects.filter(
+                    mapping_info=mapping_info
+                )
+            }
+
+            # parse
+            for key in df.columns:
+                if key in mapping_from_to.keys():
+                    df.rename(columns={key: mapping_from_to[key]}, inplace=True)
+                else:
+                    df.drop([key], axis='columns', inplace=True)
+
+            # save the parsed file
+            # parsed_file_path = os.path.join(settings.DATA_PARSED, parsedFile.__str__()) 
+            parsed_file_path = os.path.join(settings.MEDIA_ROOT, parsedFile.file_original.name.replace('data_original/', 'data_parsed/'))
+            df.to_csv(parsed_file_path, index=False)
+
+            # increment submit count of Participation tuple by 1
+            participation = Participation.objects.filter(
+                account=submitter, task=task)[0]
+            participation.submit_count += 1
+            participation.save()
+
+            # make statistic
+            # print(df.isnull().sum()/(len(df)*len(df.columns)), "###")
+            duplicated_tuple = len(df)-len(df.drop_duplicates())
+            null_ratio = df.isnull().sum().sum()/(len(df)*len(df.columns)
+                                                ) if (len(df)*len(df.columns)) > 0 else 1
+            
+            # save the parsed file
+            parsedFile.submit_number = participation.submit_count
+            parsedFile.total_tuple = len(df)
+            parsedFile.duplicated_tuple = duplicated_tuple
+            parsedFile.null_ratio = null_ratio
+            # grading_score=,   # TODO: should be immplemented
+            # pass_state=False,
+            # parsedFile.grading_end_date = datetime.now(),    # TODO: should be implemented
+            parsedFile.file_parsed = parsed_file_path
+            parsedFile.save()
+
+            # TODO: data too long error
+            # select @@global.sql_mode;  # SQL 설정 보기
+            # TODO: remove "STRICT_TRANS_TABLES" by set command without this attribute
+            # set @@global.sql_mode="ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION";
+
+            # TODO: Return 부분 수정해야함
+            form = UploadForm()
+        # elif schema_choice_form.is_valid():
+
+    else:
+        form = UploadForm()
+        # schema_choice_form = SchemaChoiceForm()
+    
+    parsedfile_list = user.account.parsed_submits.filter(task=task)
+    total_tuple = sum(
+        parsedfile.total_tuple if parsedfile.total_tuple else 0 for parsedfile in parsedfile_list
+    )
+
+    context = {
+        'task': task,
+        'parsedfile_list': parsedfile_list,
+        'total_tuple': total_tuple,
+        'file_upload_form': form,
+    }
+    # return redirect(reverse('collect:submitted-parsedfiles', kwargs=context))
+
+    return render(request, 'collect/submitted_parsedfile.html', context)
 
 
 # 평가된 파일 목록
@@ -485,7 +600,7 @@ def createTask(request):
         if form.is_valid():
             # form = form.save(commit=False) # 중복 DB save를 방지
             task = form.save()
-            # task.activation_state = True
+            task.activation_state = True    # TODO: basically task should be disabled when just created
             task.save()
 
             # return render(request, 'manager/done_task.html', {})

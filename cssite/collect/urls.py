@@ -28,7 +28,7 @@ urlpatterns = [
     path('participations/<int:pk>/delete/',
          views.delete_participation, name='delete-participation'),
     path('tasks/<int:pk>/parsedfiles/',
-         views.ParsedfileList.as_view(), name='submitted-parsedfiles'),
+         views.parsedFileListAndUpload, name='submitted-parsedfiles'),
     path('graded-parsedfiles/', views.GradedfileList.as_view(),
          name='graded-parsedfiles'),
     path('allocated-parsedfiles/', views.AllocatedfileList.as_view(),

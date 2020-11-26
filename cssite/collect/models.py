@@ -1,9 +1,12 @@
+import os
+
 from django import forms
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
 
 
 class Account(models.Model):
@@ -27,7 +30,7 @@ class Account(models.Model):
     role = models.CharField('역할', max_length=10, choices=ROLE_CHOICES)
 
     def __str__(self):
-        return self.user.username
+        return self.user.__str__()
 
 
 class Task(models.Model):
@@ -59,45 +62,6 @@ class Participation(models.Model):
 def grading_score_validator(value):
     if value < 0 or value > 10:
         raise forms.ValidationError('0 ~ 10 사이의 숫자를 입력해주세요.')
-
-
-class ParsedFile(models.Model):
-    submitter = models.ForeignKey(
-        Account, on_delete=models.CASCADE, related_name='parsed_submits', verbose_name='제출자')
-    grader = models.ForeignKey(
-        Account, on_delete=models.CASCADE, related_name='parsed_grades', verbose_name='평가자')
-    task = models.ForeignKey(
-        Task, on_delete=models.CASCADE, related_name='parsedfiles', verbose_name='태스크')
-    directory = models.CharField('파일 이름', max_length=200)
-    submit_number = models.IntegerField('제출 회차')
-    start_date = models.DateField('수집 시작 날짜')
-    end_date = models.DateField('수집 종료 날짜')
-    total_tuple = models.IntegerField('전체 튜플 수')
-    duplicated_tuple = models.IntegerField('중복 튜플 수')
-    null_ratio = models.FloatField('null 비율')
-    grading_score = models.IntegerField('평가 점수', null=True, blank=True)
-    pass_state = models.BooleanField('패스 여부', null=True, blank=True)
-    grading_end_date = models.DateField('평가 종료 날짜')
-
-    file_original = models.FileField(
-        '파일',
-        null=True,
-        blank=True,
-        upload_to="data_original/"
-    )
-
-    file_parsed = models.FileField(
-        '처리된 파일',
-        null=True,
-        blank=True,
-        upload_to="data_parsed/"
-    )
-
-    def __str__(self):
-        """
-        return file name
-        """
-        return self.directory
 
 
 class SchemaAttribute(models.Model):
@@ -147,27 +111,56 @@ class MappingPair(models.Model):
         return dictionary.__str__()
 
 
-class OriginFile(models.Model):
-    """
-    docstring
-    """
-    # name = models.CharField('파일명', max_length=200)
-    derived_schema = models.ForeignKey(
-        MappingInfo, on_delete=models.CASCADE, related_name='file_parsing_schema', verbose_name='파생 스키마')
-    file_original = models.FileField(
-        '파일', null=True, blank=True, upload_to="data_original/", max_length=100)
+class ParsedFile(models.Model):
+    submitter = models.ForeignKey(
+        Account, on_delete=models.CASCADE, related_name='parsed_submits', verbose_name='제출자')
+    grader = models.ForeignKey(
+        Account, on_delete=models.CASCADE, related_name='parsed_grades', verbose_name='평가자')
+    task = models.ForeignKey(
+        Task, on_delete=models.CASCADE, related_name='parsedfiles', verbose_name='태스크')
+    # directory = models.CharField('파일 이름', max_length=200)
+    submit_number = models.IntegerField('제출 회차', null=True)
+    start_date = models.DateField('수집 시작 날짜', null=True)
+    end_date = models.DateField('수집 종료 날짜', null=True)
+    total_tuple = models.IntegerField('전체 튜플 수', null=True)
+    duplicated_tuple = models.IntegerField('중복 튜플 수', null=True)
+    null_ratio = models.FloatField('null 비율', null=True)
+    grading_score = models.IntegerField('평가 점수', null=True, blank=True)
+    pass_state = models.BooleanField('패스 여부', null=True, blank=True, default=None)
+    grading_end_date = models.DateField('평가 종료 날짜', null=True)
 
-    def __str__(self):
-        """
-        docstring
-        """
-        return self.file_original.name
+    derived_schema = models.ForeignKey(MappingInfo, on_delete=models.CASCADE, related_name='file_parsing_schema', verbose_name='파생 스키마')
+
+    file_original = models.FileField(
+        '파일',
+        null=True,
+        blank=True,
+        upload_to="data_original/"
+    )
+
+    file_parsed = models.FileField(
+        '처리된 파일',
+        null=True,
+        blank=True,
+        upload_to="data_parsed/"
+    )
+
 
     def get_absolute_path(self):
-        return os.path.join(settings.MEDIA_ROOT, self.file_original.name)
+        return os.path.join(settings.MEDIA_ROOT, self.file_parsed.name)
 
     def delete(self, *args, **kargs):
         if self.file_original:
             os.remove(os.path.join(
                 settings.MEDIA_ROOT, self.file_original.name))
-        super(OriginFile, self).delete(*args, **kargs)
+            os.remove(os.path.join(
+                settings.MEDIA_ROOT, self.file_parsed.name))
+        super(ParsedFile, self).delete(*args, **kargs)
+
+    def __str__(self):
+        """
+        return file name
+        """
+        # return self.file_parsed.name.replace('data_parsed/', '')
+        return os.path.basename(self.file_original.name)
+
