@@ -1,16 +1,19 @@
 # MacOS .DS_Store file
+.DS_Store
 *.DS_Store
+
 
 # keys ignoring
 # TODO: if development is done, hide this key for publishing
 cssite/secrets.json
+cssite/cssite/secrets.json
 # keygen.py
 
 # test database ignoring
+media/*
 cssite/media/*
 
-
-cssite/cssite/secrets.json
+collect/migrations/*
 cssite/collect/migrations/*
 
 # Created by https://www.toptal.com/developers/gitignore/api/windows,python,django,vscode
