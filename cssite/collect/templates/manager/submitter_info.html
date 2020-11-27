@@ -1,0 +1,32 @@
+{% extends 'collect/manager.html' %}
+{% block main_content %}
+    <h1>참여 신청 중인 태스크 목록</h1>
+    <p>태스크 이름-참여 상태-참여 신청</p>
+    <ul>
+    {% for participate in participations %}
+        {% if not participate.admission %}
+        <li>
+            <a href="{% url 'collect:task-detail' participate.task.id %}">{{ participate.task.name }}</a>
+            참여 신청 중
+            <a href = "{% url 'acknowledge participation' participate.id %}"><button>참여 승인</button></a>
+            <a href = "{% url 'delete participation' participate.id %}"><button>참여 거절</button></a>
+        </li>
+        {% endif %}
+    {% endfor %}
+    </ul>
+    
+    <h1>참여 중인 태스크 목록</h1>
+    <p>태스크 이름-제출한 파일 수-상세조회</p>
+    <ul>
+    {% for participate in participations %}
+        {% if participate.admission %}
+        <li>
+            <a href="{% url 'collect:task-detail' participate.task.id %}">{{ participate.task.name }}</a>
+            {{ participate.submit_count }}
+            <a href="{% url 'submitted-parsedfiles' participate.task.id user.id %}">상세조회</a>
+        </li>
+        {% endif %}
+    {% endfor %}
+    </ul>
+{% endblock main_content %}
+        

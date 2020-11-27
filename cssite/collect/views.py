@@ -6,7 +6,7 @@ from django.contrib import auth, messages
 from django.contrib.auth.models import User
 from .models import Account, Task, Participation, ParsedFile, SchemaAttribute, MappingInfo, MappingPair
 from .forms import LoginForm, GradeForm, SchemaChoiceForm, UploadForm, CreateTask, CreateSchemaAttribute, CreateMappingInfo, CreateMappingPair
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import os
 import pandas as pd
 from django.conf import settings
@@ -26,11 +26,6 @@ def index(request):
     elif user.role == "관리자":
         return redirect(reverse('collect:manager'))
 
-        
-
-
-    
-
 
 def fileList(request):
     """
@@ -41,9 +36,8 @@ def fileList(request):
         'files_parsed': str(list(ParsedFile.objects.values())),
     })
 
+
 # 회원가입
-
-
 def signup(request):
     context = {}
     if request.method == "POST":
@@ -71,9 +65,8 @@ def signup(request):
             context.update({'error': "비밀번호가 일치하지 않습니다."})
     return render(request, 'collect/signup.html', context)
 
+
 # 로그인
-
-
 def login(request):
     if request.method == "POST":
         username = request.POST['username']
@@ -131,9 +124,8 @@ def update(request, pk):
                 return redirect(reverse('collect:allocated-parsedfiles'))
     return render(request, 'collect/update.html')
 
+
 # 회원 탈퇴
-
-
 def delete(request, pk):
     user = User.objects.get(pk=pk)
     user.delete()
@@ -156,10 +148,12 @@ class TaskList(View):
 
 
 # 태스크 상세 정보
-class TaskDetail(generic.DetailView):
-    model = Task
-    context_object_name = 'task'
-    template_name = 'collect/task_detail.html'
+class TaskDetail(View):
+    def get(self, request, pk):
+        task = get_object_or_404(Task, pk=pk)
+        if request.user.account.role == '관리자':
+            return render(request, 'manager/task_detail.html', {'task': task})
+        return render(request, 'collect/task_detail.html', {'task': task})
 
 
 # 태스크 참여
@@ -197,6 +191,7 @@ def manager_acknowledge_participation(request, part_id):
         participation.save()
         return redirect(reverse('show task', kwargs={'task_id': task.id}))
 
+
 # 관리자: 태스크 참여 거절
 def manager_delete_participation(request, part_id):
     if request.user.is_superuser:
@@ -204,6 +199,20 @@ def manager_delete_participation(request, part_id):
         participation = get_object_or_404(Participation, pk=part_id)
         participation.delete()
         return redirect(reverse('show task', kwargs={'task_id': task.id}))
+
+
+# 관리자: 제출자가 제출한 파일 목록
+def submittedfile_list(request, task_id, user_id):
+    user = get_object_or_404(User, pk=user_id)
+    task = get_object_or_404(Task, pk=task_id)
+    parsedfile_list = user.account.parsed_submits.filter(task=task)
+    total_tuple = sum(parsedfile.total_tuple if parsedfile.total_tuple else 0 for parsedfile in parsedfile_list)
+    context = {
+        'task': task,
+        'parsedfile_list': parsedfile_list,
+        'total_tuple': total_tuple
+    }
+    return render(request, 'manager/submitted_parsedfile.html', context)
 
 
 # 제출한 파일 목록
@@ -370,9 +379,8 @@ def grade_parsedfile(request, pk):
         }
         return render(request, 'collect/grade.html', context)
 
+
 # 유저 검색
-
-
 class UserList(View):
     def get(self, request):
         tasks = Task.objects.all()
@@ -405,15 +413,15 @@ class UserList(View):
 # 유저 상세 정보
 class UserDetail(View):
     def get(self, request, pk):
-        user = User.objects.get(pk=pk)
+        user = get_object_or_404(User, pk=pk)
         if user.account.role == '제출자':
             participations = user.account.participations.all()
-            return render(request, 'collect/participation.html', {'participations': participations})
+            return render(request, 'manager/submitter_info.html', {'participations': participations, 'user':user})
         elif user.account.role == '평가자':
             user = User.objects.get(pk=pk)
             parsedfiles = user.account.parsed_grades.filter(
                 grading_score__isnull=False)
-            return render(request, 'collect/graded_parsedfile.html', {'parsedfiles': parsedfiles})
+            return render(request, 'manager/graded_parsedfile.html', {'parsedfiles': parsedfiles})
 
 
 def submitter(request):
@@ -586,6 +594,37 @@ def showTask(request, task_id):
         'part_in': part_in,
         'applied': applied,
     })
+
+
+# 관리자: 파싱데이터 시퀀스 파일 목록
+def parsedfile_list(request, task_id):
+    task = get_object_or_404(Task, pk=task_id)
+    parsedfiles = ParsedFile.objects.filter(task=task)
+    context = {
+        'parsedfiles': parsedfiles,
+        'count': len(parsedfiles)
+    }
+    return render(request, 'manager/parsedfile_list.html', context)
+
+
+# 관리자: 평가자 목록
+def grader_list(request, file_id):
+    graders = Account.objects.filter(role='평가자')
+    context = {
+        'graders': graders,
+        'file_id': file_id
+    }
+    return render(request, 'manager/grader_list.html', context)
+
+
+# 관리자: 평가자 배정
+def allocate_file(request, file_id, account_id):
+    file = get_object_or_404(ParsedFile, pk=file_id)
+    account = get_object_or_404(Account, pk=account_id)
+    file.grader = account
+    file.grading_end_date = date.today() + timedelta(weeks=1)
+    file.save()
+    return redirect('list tasks')
 
 
 def createTask(request):

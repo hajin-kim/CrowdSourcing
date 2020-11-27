@@ -31,7 +31,7 @@
         <ul>
         {% for parsedfile in parsedfiles %}
             <li>
-                {{ parsedfile.task.name }} {{ parsedfile.directory }} {{ parsedfile.grade_date }} {{ parsedfile.grading_score }}
+                {{ parsedfile.task.name }} {{ parsedfile }} {{ parsedfile.grade_date }} {{ parsedfile.grading_score }}
                 {% if parsedfile.pass_state %}
                     Pass
                 {% else %}

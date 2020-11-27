@@ -1,0 +1,8 @@
+{% extends 'collect/manager.html' %}
+{% block main_content %}
+    <h1>태스크 정보</h1>
+    <p>태스크 이름: {{ task.name }}</p>
+    <p>최소 업로드 주기: {{ task.minimal_upload_frequency }}</p>
+    <p>태스크 설명: {{ task.description }}</p>
+    <p>원본 데이터 설명: {{ task.original_data_description }}</p>
+{% endblock main_content %}

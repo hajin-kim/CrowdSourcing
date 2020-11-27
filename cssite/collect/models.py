@@ -115,19 +115,19 @@ class ParsedFile(models.Model):
     submitter = models.ForeignKey(
         Account, on_delete=models.CASCADE, related_name='parsed_submits', verbose_name='제출자')
     grader = models.ForeignKey(
-        Account, on_delete=models.CASCADE, related_name='parsed_grades', verbose_name='평가자')
+        Account, on_delete=models.CASCADE, related_name='parsed_grades', verbose_name='평가자', null=True, blank=True)
     task = models.ForeignKey(
         Task, on_delete=models.CASCADE, related_name='parsedfiles', verbose_name='태스크')
-    # directory = models.CharField('파일 이름', max_length=200)
     submit_number = models.IntegerField('제출 회차', null=True)
     start_date = models.DateField('수집 시작 날짜', null=True)
     end_date = models.DateField('수집 종료 날짜', null=True)
     total_tuple = models.IntegerField('전체 튜플 수', null=True)
     duplicated_tuple = models.IntegerField('중복 튜플 수', null=True)
     null_ratio = models.FloatField('null 비율', null=True)
-    grading_score = models.IntegerField('평가 점수', null=True, blank=True)
+    grading_score = models.IntegerField('평가 점수', null=True, blank=True, validators=[grading_score_validator])
     pass_state = models.BooleanField('패스 여부', null=True, blank=True, default=None)
     grading_end_date = models.DateField('평가 종료 날짜', null=True)
+    grade_date = models.DateField('평가 날짜', auto_now=True)
 
     derived_schema = models.ForeignKey(MappingInfo, on_delete=models.CASCADE, related_name='file_parsing_schema', verbose_name='파생 스키마')
 

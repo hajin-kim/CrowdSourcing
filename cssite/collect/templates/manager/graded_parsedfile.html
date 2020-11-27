@@ -1,0 +1,17 @@
+{% extends 'collect/manager.html' %}
+{% block main_content %}
+<h1>평가 기록</h1>
+<ul>
+{% for parsedfile in parsedfiles %}
+    <li>
+        {{ parsedfile.task.name }} {{ parsedfile }} {{ parsedfile.grade_date }} {{ parsedfile.grading_score }}
+        {% if parsedfile.pass_state %}
+            Pass
+        {% else %}
+            NonPass
+        {% endif %}
+    </li>
+{% endfor %}
+</ul>
+{% endblock main_content %}
+        

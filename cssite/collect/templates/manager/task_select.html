@@ -3,7 +3,7 @@
 {% block main_content %}
   <h2>{{ task.name }}</h2>
   
-  <h3>태스크 정보</h1>
+  <h3>태스크 정보</h3>
   <p>태스크 이름: {{ task.name }}</p>
   <p>최소 업로드 주기: {{ task.minimal_upload_frequency }}</p>
   <p>태스크 설명: {{ task.description }}</p>
@@ -28,7 +28,8 @@
   <br>
   {% endfor %}
 
-  
+  <a href="{% url 'parsedfile list' task.id %}">파싱 데이터 시퀀스 파일</a>
+
   <div>
     <a href="./attribute">
       속성 관리

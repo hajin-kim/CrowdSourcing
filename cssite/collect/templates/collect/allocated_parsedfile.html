@@ -31,7 +31,7 @@
         <ul>
         {% for parsedfile in parsedfiles %}
             <li>
-                {{ parsedfile.task.name }} {{ parsedfile.directory }}
+                {{ parsedfile.task.name }} {{ parsedfile }}
                 {% if parsedfile.grading_end_date > now %}
                     <a href="{% url 'collect:grade-parsedfile' parsedfile.id %}">평가하기</a>
                 {% else %}

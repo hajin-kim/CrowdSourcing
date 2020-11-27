@@ -1,0 +1,15 @@
+{% extends 'collect/manager.html' %}
+
+{% block main_content %}
+    <h3>파싱 데이터 시퀀스 파일 목록</h3>
+    현재 제출된 파싱 데이터 시퀀스 파일 수: {{ count }}
+    <ul>
+    {% for parsedfile in parsedfiles %}
+        {% if parsedfile.grader %}
+            <li>{{ parsedfile }} 배정 완료</li>
+        {% else %}
+            <li>{{ parsedfile }} <a href="{% url 'grader list' parsedfile.id %}">평가자 배정</a></li>
+        {% endif %}
+    {% endfor %}
+    </ul>
+{% endblock main_content %}

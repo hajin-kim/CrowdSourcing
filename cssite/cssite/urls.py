@@ -28,6 +28,12 @@ urlpatterns = [
     path('task/part/<int:part_id>/ack', manager_acknowledge_participation, name='acknowledge participation'),
     path('task/part/<int:part_id>/del', manager_delete_participation, name='delete participation'),
     path('task/create/', createTask, name='create task'),
+    path('task/<int:task_id>/parsedfiles/', parsedfile_list, name='parsedfile list'),
+    path('tasks/<int:task_id>/parsedfiles/<int:user_id>/',
+         submittedfile_list, name='submitted-parsedfiles'),
+
+    path('parsedfile/<int:file_id>/graders/', grader_list, name='grader list'),
+    path('parsedfile/<int:file_id>/grader/<int:account_id>/', allocate_file, name='allocate file'),
 
     path('task/<int:task_id>/attribute/',
          listAttributes, name='list attributes'),
