@@ -4,12 +4,16 @@ from django.urls import reverse
 from django.views import generic, View
 from django.contrib import auth, messages
 from django.contrib.auth.models import User
+from django.conf import settings
+
 from .models import Account, Task, Participation, ParsedFile, SchemaAttribute, MappingInfo, MappingPair
 from .forms import LoginForm, GradeForm, SchemaChoiceForm, UploadForm, CreateTask, CreateSchemaAttribute, CreateMappingInfo, CreateMappingPair
+
 from datetime import date, datetime, timedelta
 import os
 import pandas as pd
-from django.conf import settings
+import mimetypes
+import urllib
 
 
 # 홈
@@ -447,6 +451,10 @@ def uploadFile(request):
         form = UploadForm(request.POST, request.FILES)
         # schema_choice_form = SchemaChoiceForm(request.POST, request.FILES)
         if form.is_valid():
+            if not os.path.exists(settings.JOINED_PATH_DATA_ORIGINAL):
+                os.mkdir(settings.JOINED_PATH_DATA_ORIGINAL)
+            if not os.path.exists(settings.JOINED_PATH_DATA_PARSED):
+                os.mkdir(settings.JOINED_PATH_DATA_PARSED)
             # form = form.save(commit=False) # 중복 DB save를 방지
             saved_original_file = form.save()
         # elif schema_choice_form.is_valid():
@@ -594,6 +602,52 @@ def showTask(request, task_id):
         'part_in': part_in,
         'applied': applied,
     })
+
+def downloadAllFiles(request, task_id):
+    """
+    docstring
+    """
+
+    task = get_object_or_404(Task, pk=task_id)
+
+    attr = [ attrObj.attr for attrObj in SchemaAttribute.objects.filter(task=task) ]
+    parsedfile_list = ParsedFile.objects.filter(task=task)
+
+    # df = pd.DataFrame(columns=attr)
+    # df = pd.read_csv(os.path.join(settings.JOINED_PATH_DATA_PARSED, parsedfile_list[0].__str__()))
+    file_list = []
+    # print(df)
+    # print("#####")
+
+    for parsedFileObj in parsedfile_list:
+        if not parsedFileObj.file_parsed is None:
+            df_parsedFile = pd.read_csv(os.path.join(settings.JOINED_PATH_DATA_PARSED, parsedFileObj.__str__()))
+            # df.append(df_parsedFile, ignore_index=True)
+            file_list.append(df_parsedFile)
+            # print(df_parsedFile)
+        # print(df)
+        # print("#")
+
+    if not os.path.exists(settings.JOINED_PATH_DATA_INTEGRATED):
+        os.mkdir(settings.JOINED_PATH_DATA_INTEGRATED)
+    
+    download_file_path = os.path.join(settings.JOINED_PATH_DATA_INTEGRATED, task.name) + ".csv"
+    df = pd.concat(file_list, axis=0, ignore_index=True)
+    df.to_csv(download_file_path, header=attr, index=True)
+
+
+    file_name = urllib.parse.quote((task.name+'.csv').encode('utf-8'))
+    
+    if os.path.exists(download_file_path):
+        with open(download_file_path, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type=mimetypes.guess_type(download_file_path)[0])
+            response['Content-Disposition'] = 'attachment;filename*=UTF-8\'\'%s' % file_name
+            return response
+
+    
+
+    return showTask(request, task_id)
+
 
 
 # 관리자: 파싱데이터 시퀀스 파일 목록

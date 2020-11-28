@@ -25,6 +25,7 @@ urlpatterns = [
 
     path('task/', listTasks, name='list tasks'),
     path('task/<int:task_id>/', showTask, name='show task'),
+    path('task/<int:task_id>/download', downloadAllFiles, name='download all files'),
     path('task/part/<int:part_id>/ack', manager_acknowledge_participation, name='acknowledge participation'),
     path('task/part/<int:part_id>/del', manager_delete_participation, name='delete participation'),
     path('task/create/', createTask, name='create task'),

@@ -28,8 +28,12 @@
   <br>
   {% endfor %}
 
+  <div>
+    <a href="./download">
+      데이터 다운받기
+    </a>
+  </div>
   <a href="{% url 'parsedfile list' task.id %}">파싱 데이터 시퀀스 파일</a>
-
   <div>
     <a href="./attribute">
       속성 관리
