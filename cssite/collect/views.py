@@ -219,7 +219,42 @@ def submittedfile_list(request, task_id, user_id):
     return render(request, 'manager/submitted_parsedfile.html', context)
 
 
-# 제출한 파일 목록
+def syncTotalTableFile(task):
+    """
+    파싱된 파일 전부 통합해 마스터 테이블에 등록
+    사용처
+     - 평가자가 패스한 후
+     - 관리자가 태스크 조회할 때
+    """
+    attr = [ attrObj.attr for attrObj in SchemaAttribute.objects.filter(task=task) ]
+    parsedfile_list = ParsedFile.objects.filter(task=task)
+
+    # df = pd.DataFrame(columns=attr)
+    # df = pd.read_csv(os.path.join(settings.JOINED_PATH_DATA_PARSED, parsedfile_list[0].__str__()))
+    file_list = []
+    # print(df)
+    # print("#####")
+
+    for parsedFileObj in parsedfile_list:
+        if not parsedFileObj.file_parsed is None:
+            df_parsedFile = pd.read_csv(os.path.join(settings.JOINED_PATH_DATA_PARSED, parsedFileObj.__str__()))
+            # df.append(df_parsedFile, ignore_index=True)
+            file_list.append(df_parsedFile)
+            # print(df_parsedFile)
+        # print(df)
+        # print("#")
+
+    if not os.path.exists(settings.JOINED_PATH_DATA_INTEGRATED):
+        os.mkdir(settings.JOINED_PATH_DATA_INTEGRATED)
+    
+    download_file_path = os.path.join(settings.JOINED_PATH_DATA_INTEGRATED, task.name) + ".csv"
+    df = pd.concat(file_list, axis=0, ignore_index=True)
+    df.to_csv(download_file_path, header=attr, index=True)
+
+    return download_file_path
+
+
+# 제출자: 제출한 파일 목록 확인 및 업로드
 def parsedFileListAndUpload(request, pk):
     os.makedirs(settings.JOINED_PATH_DATA_ORIGINAL, exist_ok=True)
     os.makedirs(settings.JOINED_PATH_DATA_PARSED, exist_ok=True)
@@ -310,7 +345,7 @@ def parsedFileListAndUpload(request, pk):
             # select @@global.sql_mode;  # SQL 설정 보기
             # TODO: remove "STRICT_TRANS_TABLES" by set command without this attribute
             # set @@global.sql_mode="ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION";
-
+            
             # TODO: Return 부분 수정해야함
             form = UploadForm()
         # elif schema_choice_form.is_valid():
@@ -440,122 +475,6 @@ def manager(request):
     return render(request, 'collect/manager.html')
 
 
-def uploadFile(request):
-    """
-    docstring
-    """
-    form = None
-    # schema_choice_form = None
-    saved_original_file = None
-    if request.method == 'POST':
-        form = UploadForm(request.POST, request.FILES)
-        # schema_choice_form = SchemaChoiceForm(request.POST, request.FILES)
-        if form.is_valid():
-            if not os.path.exists(settings.JOINED_PATH_DATA_ORIGINAL):
-                os.mkdir(settings.JOINED_PATH_DATA_ORIGINAL)
-            if not os.path.exists(settings.JOINED_PATH_DATA_PARSED):
-                os.mkdir(settings.JOINED_PATH_DATA_PARSED)
-            # form = form.save(commit=False) # 중복 DB save를 방지
-            saved_original_file = form.save()
-        # elif schema_choice_form.is_valid():
-
-    else:
-        form = UploadForm()
-        # schema_choice_form = SchemaChoiceForm()
-
-    if saved_original_file:
-        # TODO: 이 부분 구현해야 합니다!
-        # 각 릴레이션의 튜풀을 받아야 합니다.
-        # 이런 식으로요:
-        # task = Task.objects.filter(***)[0]
-        # 아마 key 등을 이 함수의 파라미터를 통해 받아오는 방법 등을 택할 것 같네요.
-        task_name = "test_task"
-        submitter_pk = "test_id"
-        grader_pk = "test_id"
-
-        task = Task.objects.filter(name=task_name)[0]
-        submitter = Account.objects.filter(id=submitter_pk)[0]
-        grader = Account.objects.filter(id=grader_pk)[0]
-
-        derived_schema = saved_original_file.derived_schema
-
-        # print(saved_original_file.get_absolute_path(), "###")
-        # load csv file from the server
-        df = pd.read_csv(saved_original_file.get_absolute_path())
-
-        # get DB tuples
-        mapping_info = MappingInfo.objects.filter(
-            task=task,
-            derived_schema_name=derived_schema
-        )[0]
-
-        # get parsing information into a dictionary
-        # { 파싱전: 파싱후 }
-        mapping_from_to = {
-            i.parsing_column_name: i.schema_attribute.attr
-            for i in MappingPair.objects.filter(
-                mapping_info=mapping_info
-            )
-        }
-
-        # parse
-        for key in df.columns:
-            if key in mapping_from_to.keys():
-                df.rename(columns={key: mapping_from_to[key]}, inplace=True)
-            else:
-                df.drop([key], axis='columns', inplace=True)
-
-        # save the parsed file
-        parsed_file_path = os.path.join(settings.MEDIA_ROOT, str(
-            saved_original_file).replace('data_original/', 'data_parsed/'))
-        df.to_csv(parsed_file_path, index=False)
-
-        # increment submit count of Participation tuple by 1
-        participation = Participation.objects.filter(
-            account=submitter, task=task)[0]
-        participation.submit_count += 1
-        participation.save()
-
-        # make statistic
-        # print(df.isnull().sum()/(len(df)*len(df.columns)), "###")
-        duplicated_tuple = len(df)-len(df.drop_duplicates())
-        null_ratio = df.isnull().sum().sum()/(len(df)*len(df.columns)
-                                              ) if (len(df)*len(df.columns)) > 0 else 1
-        parsed_file = ParsedFile(
-            task=task,
-            submitter=submitter,
-            grader=grader,
-            submit_count=participation.submit_count,
-            start_date=datetime.now(),  # TODO: should be implemented that user can select the date
-            end_date=datetime.now(),    # TODO: should be implemented that user can select the date
-            total_tuple=len(df),
-            duplicated_tuple=duplicated_tuple,
-            null_ratio=null_ratio,
-            # grading_score=,   # TODO: should be immplemented
-            pass_state=False,
-            grading_end_date=datetime.now(),    # TODO: should be implemented
-        )
-
-        # save the parsed file
-        # print(df)
-        parsed_file.file_original = str(saved_original_file)
-        parsed_file.file_parsed = str(saved_original_file).replace(
-            'data_original/', 'data_parsed/')
-        parsed_file.save()
-
-        # TODO: data too long error
-        # select @@global.sql_mode;  # SQL 설정 보기
-        # remove: "STRICT_TRANS_TABLES"
-        # set @@global.sql_mode="ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION";
-
-        # TODO: Return 부분 수정해야함
-        return redirect('list files')
-
-    return render(request, 'manager/upload.html', {
-        'file_upload_form': form
-    })
-
-
 def generateListString(iterable):
     """
     1. each element of iterable contains .__str__()
@@ -594,11 +513,17 @@ def showTask(request, task_id):
     part_in = Participation.objects.filter(task=task, admission=True)
     applied = Participation.objects.filter(task=task, admission=False)
 
+    # count the number of tuple
+    table_file = syncTotalTableFile(task)
+    df_table_file = pd.read_csv(table_file)
+    num_of_tuples = len(df_table_file)
+
     return render(request, 'manager/task_select.html', {
         'task': task,
         'task_info': str(list(Task.objects.filter(id=task_id).values())),
         'task_attributes': attributes,
         'task_derived_schemas': derived_schemas,
+        'num_of_tuples': num_of_tuples,
         'part_in': part_in,
         'applied': applied,
     })
@@ -610,31 +535,7 @@ def downloadAllFiles(request, task_id):
 
     task = get_object_or_404(Task, pk=task_id)
 
-    attr = [ attrObj.attr for attrObj in SchemaAttribute.objects.filter(task=task) ]
-    parsedfile_list = ParsedFile.objects.filter(task=task)
-
-    # df = pd.DataFrame(columns=attr)
-    # df = pd.read_csv(os.path.join(settings.JOINED_PATH_DATA_PARSED, parsedfile_list[0].__str__()))
-    file_list = []
-    # print(df)
-    # print("#####")
-
-    for parsedFileObj in parsedfile_list:
-        if not parsedFileObj.file_parsed is None:
-            df_parsedFile = pd.read_csv(os.path.join(settings.JOINED_PATH_DATA_PARSED, parsedFileObj.__str__()))
-            # df.append(df_parsedFile, ignore_index=True)
-            file_list.append(df_parsedFile)
-            # print(df_parsedFile)
-        # print(df)
-        # print("#")
-
-    if not os.path.exists(settings.JOINED_PATH_DATA_INTEGRATED):
-        os.mkdir(settings.JOINED_PATH_DATA_INTEGRATED)
-    
-    download_file_path = os.path.join(settings.JOINED_PATH_DATA_INTEGRATED, task.name) + ".csv"
-    df = pd.concat(file_list, axis=0, ignore_index=True)
-    df.to_csv(download_file_path, header=attr, index=True)
-
+    download_file_path = syncTotalTableFile(task)
 
     file_name = urllib.parse.quote((task.name+'.csv').encode('utf-8'))
     
