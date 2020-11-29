@@ -291,9 +291,36 @@ def parsedFileListAndUpload(request, pk):
             original_file_path = os.path.join(settings.MEDIA_ROOT, 
                 parsedFile.file_original.name)
 
+            # guess type and load file into pd.DataFrame
+            # types: https://www.iana.org/assignments/media-types/media-types.xhtml
+            original_file_type = mimetypes.guess_type(original_file_path)
+            df = None
+            # names=['ID', 'A', 'B', 'C', 'D'], header=None
+            # header=0
+            # encoding='CP949'
+            # encoding='latin'
+            if original_file_type[0] == 'text/csv':
+                # load csv file from the server-stored file
+                df = pd.read_csv(original_file_path)
+            elif original_file_type[0] in (
+                    'application/vnd.ms-excel', # official
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', # xlsx
+                    'application/msexcel',
+                    'application/x-msexcel',
+                    'application/x-ms-excel',
+                    'application/x-excel',
+                    'application/x-dos_ms_excel',
+                    'application/xls',
+                    'application/x-xls',
+                ):
+                df = pd.read_excel(original_file_path)
+            elif original_file_type[0] == 'application/json':
+                df = pd.read_json(original_file_path)
+            elif original_file_type[0] == 'text/html':
+                df = pd.read_html(original_file_path)
+            
+            
             # print(saved_original_file.get_absolute_path(), "###")
-            # load csv file from the server
-            df = pd.read_csv(original_file_path)
 
             # get DB tuples
             mapping_info = MappingInfo.objects.filter(
