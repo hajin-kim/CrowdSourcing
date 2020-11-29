@@ -541,7 +541,8 @@ def downloadAllFiles(request, task_id):
     
     if os.path.exists(download_file_path):
         with open(download_file_path, 'rb') as fh:
-            response = HttpResponse(fh.read(), content_type=mimetypes.guess_type(download_file_path)[0])
+            response = HttpResponse(fh.read(), content_type='text/csv')
+            # response = HttpResponse(fh.read(), content_type=mimetypes.guess_type(download_file_path)[0])
             response['Content-Disposition'] = 'attachment;filename*=UTF-8\'\'%s' % file_name
             return response
 
