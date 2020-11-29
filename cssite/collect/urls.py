@@ -35,6 +35,8 @@ urlpatterns = [
          name='allocated-parsedfiles'),
     path('allocated-parsedfiles/<int:pk>/',
          views.grade_parsedfile, name='grade-parsedfile'),
+    path('allocated-parsedfiles/<int:pk>/download/',
+         views.download_parsedfile, name='download-for-grade-parsedfile'),
     path('users/', views.UserList.as_view(), name='users'),
     path('users/<int:pk>', views.UserDetail.as_view(), name='user-detail'),
     #path('list/', fileuploadViews.fileList, name='list files'),

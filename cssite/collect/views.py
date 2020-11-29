@@ -12,6 +12,7 @@ from .forms import LoginForm, GradeForm, SchemaChoiceForm, UploadForm, CreateTas
 from datetime import date, datetime, timedelta
 import os
 import pandas as pd
+import numpy as np
 import mimetypes
 import urllib
 
@@ -294,14 +295,19 @@ def parsedFileListAndUpload(request, pk):
             # guess type and load file into pd.DataFrame
             # types: https://www.iana.org/assignments/media-types/media-types.xhtml
             original_file_type = mimetypes.guess_type(original_file_path)
+            print(original_file_type)
+
             df = None
             # names=['ID', 'A', 'B', 'C', 'D'], header=None
             # header=0
             # encoding='CP949'
             # encoding='latin'
-            if original_file_type[0] == 'text/csv':
+            if original_file_type[0] in (
+                    'text/csv',
+                    'text/plain'
+                ):
                 # load csv file from the server-stored file
-                df = pd.read_csv(original_file_path)
+                df = pd.read_csv(original_file_path, na_values=('', ), keep_default_na=True)
             elif original_file_type[0] in (
                     'application/vnd.ms-excel', # official
                     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', # xlsx
@@ -313,12 +319,14 @@ def parsedFileListAndUpload(request, pk):
                     'application/xls',
                     'application/x-xls',
                 ):
-                df = pd.read_excel(original_file_path)
+                df = pd.read_excel(original_file_path, na_values=('', ), keep_default_na=True)
             elif original_file_type[0] == 'application/json':
                 df = pd.read_json(original_file_path)
             elif original_file_type[0] == 'text/html':
-                df = pd.read_html(original_file_path)
+                df = pd.read_html(original_file_path, na_values=('', ), keep_default_na=True)
             
+            if df is None:
+                return HttpResponse("제출 error")
             
             # print(saved_original_file.get_absolute_path(), "###")
 
@@ -355,10 +363,10 @@ def parsedFileListAndUpload(request, pk):
             participation.save()
 
             # make statistic
-            # print(df.isnull().sum()/(len(df)*len(df.columns)), "###")
             duplicated_tuple = len(df)-len(df.drop_duplicates())
-            null_ratio = df.isnull().sum().sum()/(len(df)*len(df.columns)
+            null_ratio = (df.isnull().sum().sum() + df.isna().sum().sum())/(len(df)*len(df.columns)
                                                 ) if (len(df)*len(df.columns)) > 0 else 1
+            print("###", null_ratio)
             
             # save the parsed file
             parsedFile.submit_number = participation.submit_count
@@ -447,6 +455,31 @@ def grade_parsedfile(request, pk):
             'parsedfile': parsedfile
         }
         return render(request, 'collect/grade.html', context)
+
+
+def download_parsedfile(request, pk):
+    """
+    docstring
+    """
+    parsedfile = get_object_or_404(ParsedFile, pk=pk)
+    
+    file_base_name = parsedfile.__str__()
+    download_file_path = os.path.join(settings.JOINED_PATH_DATA_PARSED, file_base_name)
+    file_name = urllib.parse.quote(file_base_name).encode('utf-8')
+    
+    print(file_base_name)
+    print(download_file_path)
+    print(file_name)
+
+    if os.path.exists(download_file_path):
+        with open(download_file_path, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type='text/csv')
+            # response = HttpResponse(fh.read(), content_type=mimetypes.guess_type(download_file_path)[0])
+            response['Content-Disposition'] = 'attachment;filename*=UTF-8\'\'%s' % file_base_name
+            return response
+
+    return grade_parsedfile(request, pk)
+
 
 
 # 유저 검색
@@ -577,8 +610,6 @@ def downloadAllFiles(request, task_id):
             # response = HttpResponse(fh.read(), content_type=mimetypes.guess_type(download_file_path)[0])
             response['Content-Disposition'] = 'attachment;filename*=UTF-8\'\'%s' % file_name
             return response
-
-    
 
     return showTask(request, task_id)
 

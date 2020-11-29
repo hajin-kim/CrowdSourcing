@@ -27,20 +27,25 @@
     </header>
     
     <main role="main" class="inner cover">
-        <h2>평가하기</h2>
-        <form action="{% url 'collect:grade-parsedfile' parsedfile.id %}" method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <input type="submit" value="완료">
-        </form>
-      </main>
+      <h2>평가하기</h2>
+      <form action="{% url 'collect:grade-parsedfile' parsedfile.id %}" method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <input type="submit" value="완료">
+      </form>
+      <div>
+        <a href="./download">
+          데이터 다운받기
+        </a>
+      </div>
+    </main>
 
 
-      <footer class="mastfoot mt-auto">
-        <div class="inner">
-          <p>김지현 권순석 김하진 이동우 조성현</p>
-        </div>
-      </footer>
-    </div>
+    <footer class="mastfoot mt-auto">
+      <div class="inner">
+        <p>김지현 권순석 김하진 이동우 조성현</p>
+      </div>
+    </footer>
+  </div>
     
-  </body> 
+</body>

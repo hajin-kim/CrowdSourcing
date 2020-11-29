@@ -153,8 +153,13 @@ class ParsedFile(models.Model):
         if self.file_original:
             os.remove(os.path.join(
                 settings.MEDIA_ROOT, self.file_original.name))
+        if self.file_parsed:
             os.remove(os.path.join(
                 settings.MEDIA_ROOT, self.file_parsed.name))
+        if self.submit_number:
+            participation = Participation.objects.filter(account=self.submitter, task=self.task)[0]
+            participation.submit_count -= 1
+            participation.save()
         super(ParsedFile, self).delete(*args, **kargs)
 
     def __str__(self):
