@@ -229,6 +229,9 @@ def syncTotalTableFile(task):
     attr = [ attrObj.attr for attrObj in SchemaAttribute.objects.filter(task=task) ]
     parsedfile_list = ParsedFile.objects.filter(task=task)
 
+    if not parsedfile_list:
+        return
+    
     # df = pd.DataFrame(columns=attr)
     # df = pd.read_csv(os.path.join(settings.JOINED_PATH_DATA_PARSED, parsedfile_list[0].__str__()))
     file_list = []
@@ -514,9 +517,11 @@ def showTask(request, task_id):
     applied = Participation.objects.filter(task=task, admission=False)
 
     # count the number of tuple
+    num_of_tuples = 0
     table_file = syncTotalTableFile(task)
-    df_table_file = pd.read_csv(table_file)
-    num_of_tuples = len(df_table_file)
+    if table_file:
+        df_table_file = pd.read_csv(table_file)
+        num_of_tuples = len(df_table_file)
 
     return render(request, 'manager/task_select.html', {
         'task': task,
