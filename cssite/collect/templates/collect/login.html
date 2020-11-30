@@ -114,28 +114,29 @@
             <p class = "modalText" style="top:65px; left:35px; font-size:15px"> Welcome, new guest!</p>
             
             <strong>{{ error }}</strong>
-              <div class="modalExitButton" style="top:35px; right:30px;" onclick="hideModalDiv(1);clearModalInput(2)">X</div>
+              <div class="modalExitButton" style="top:35px; right:30px;" onclick="hideModalDiv(0);clearModalInput(1)">X</div>
             <form action="{% url 'collect:signup' %}" method="post">
             {% csrf_token %}
-              <input type="text" class="modalInputForm" name="userid" style="top:110px;" placeholder="ID를 입력하세요" required>
-              <input type="text" class="modalInputForm" name="username" style="top:145px;" placeholder="이름을 입력하세요" required>
+              <input type="text" class="modalInputForm" name="username" style="top:110px;" placeholder="ID를 입력하세요" required>
+              <input type="text" class="modalInputForm" name="name" style="top:145px;" placeholder="이름을 입력하세요" required>
                     
-              <input type="password" class="modalInputForm" name="password" style="top:305px;" placeholder="비밀번호를 입력하세요" required>
-              <input type="password" class="modalInputForm" name="passwordconfirm" style="top:340px;" placeholder="비밀번호 확인" required>
-
-              <input type="date" class="modalInputDate" name="userdate" style="top:190px;" data-placeholder="생년월일을 입력하세요" required>
-              <input type="tel" class="modalInputForm" name="userphone" style="top:225px;" placeholder="연락처를 입력하세요" required>
-              <input type="text" class="modalInputForm" name="useraddress" style="top:260px;" placeholder="주소를 입력하세요" required>
+              <input type="password" class="modalInputForm" name="password1" style="top:305px;" placeholder="비밀번호를 입력하세요" required>
+              <input type="password" class="modalInputForm" name="password2" style="top:340px;" placeholder="비밀번호 확인" required>
+  
+              <input type="date" class="modalInputDate" name="birth" style="top:190px;" data-placeholder="생년월일을 입력하세요" required>
+              <input type="tel" class="modalInputForm" name="contact" style="top:225px;" placeholder="연락처를 입력하세요" required>
+              <input type="text" class="modalInputForm" name="address" style="top:260px;" placeholder="주소를 입력하세요" required>
               
+        
           
               <div class="modalInputRadioDiv" style="top:390px;">
-                <input type="radio" class="modalCheckbox" name="gender" value="submitter" checked> 남성
-                <input type="radio" class="modalCheckbox" name="gender" value="grader"> 여성
+                <input type="radio" class="modalCheckbox" name="gender" value="남성" checked> 남성
+                <input type="radio" class="modalCheckbox" name="gender" value="여성"> 여성
                 <br>
-                <input type="radio" class="modalCheckbox" name="userrole" value="submitter" checked> 제출자
-                <input type="radio" class="modalCheckbox" name="userrole" value="grader"> 평가자
+                <input type="radio" class="modalCheckbox" name="role" value="제출자" checked> 제출자
+                <input type="radio" class="modalCheckbox" name="role" value="평가자"> 평가자
               </div>
-              <input type="submit" value="회원가입" class="modalInputSubmit" style="top:450px;" onclick="passwordMatch();">
+              <input type="submit" value="회원가입" class="modalInputSubmit" style="top:450px;" onclick="passwordMatch2();">
             </form> 
           </div>
         </div>
