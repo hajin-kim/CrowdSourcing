@@ -1,6 +1,51 @@
 {% extends 'collect/submitter.html' %}
 {% block main_content %}
-    <h1>제출한 파일 목록</h1>
+
+<div id="taskParseMainDivSubmit">
+    <p class="taskListText">제출한 파일 목록</p>
+    <pre class="taskParseText">태스크 이름 : {{ task.name }}        저장된 Tuple 수 : {{ total_tuple }}</pre>
+
+    <div id="taskParseDivSubmit">
+        <table class="taskListTable">
+            <thead>
+              <tr>
+                <th>파일 이름</th>
+                <th>회차</th>
+                <th>기간</th>
+                <th>평가 점수</th>
+                <th>PASS 상태</th>
+              </tr>
+            </thead>
+            <tbody>
+                
+            {% for parsedfile in parsedfile_list %}
+              <tr>
+                  <td>{{ parsedfile }}</td>
+                  <td>{{ parsedfile.submit_number }}</td>
+                  <td>{{ parsedfile.start_date }} ~ {{ parsedfile.end_date }}</td>
+                  <td>{{ parsedfile.grading_score }}</td>
+                  <td>{{ parsedfile.pass_state }}</td>
+                  
+              </tr>
+            {% endfor %}
+            </tbody>
+        
+          </table>
+    </div>
+    <div id=taskUploadDivSubmit>
+        <p class="taskParseText">파일 업로드</p>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ file_upload_form }}
+            <input class="taskUploadButton" type="submit" value="업로드" style="top:150px;">
+        </form>
+    </div>
+
+</div>
+
+{% endblock main_content %}
+<!--
+
     태스크 이름: {{ task.name }}<br>
     저장된 tuple 수: {{ total_tuple }}
     <p>파일 이름-회차-기간-평가 점수-패스 여부</p>
@@ -18,6 +63,5 @@
         {{ file_upload_form }}
         <button type="submit">upload</button>
     </form>
-{% endblock main_content %}
 
-
+-->

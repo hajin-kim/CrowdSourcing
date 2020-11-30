@@ -52,3 +52,98 @@
   .taskListTable td{
     color : black;
   }
+
+
+  /* 태스크 parse */
+  .taskParseText {
+    color : white;
+    font-size : 20px;
+    text-align:center;
+  }
+
+  #taskParseMainDivSubmit {
+    position : relative;
+
+    min-width : 600px;
+    max-width : 800px;
+
+    min-height : 600px;
+    max-height : 1000px;
+
+    margin : 0 auto;
+
+  }
+
+  #taskParseDivSubmit {
+    position : absolute;
+
+    top : 100px;
+    
+    left : 50%;
+    transform:translateX(-50%);
+
+    width : 600px;
+    min-height : 200px;
+    max-height : 600px;
+    margin: 0 auto;
+
+    display:inline-block;
+
+    border : 2px solid #222;
+    border-radius : 10px;
+    background-color : #222;
+  }
+
+  #taskUploadDivSubmit {
+    position : absolute;
+    
+    bottom : 0px;
+
+    left : 50%;
+    transform:translateX(-50%);
+
+    width : 600px;
+    height : 200px;
+    margin: 0 auto;
+
+    display:inline-block;
+
+    border : 2px solid #222;
+    border-radius : 10px;
+    background-color : #222;
+  }
+
+
+  .taskUploadButton {
+    position: absolute;
+  
+    left : 50%;
+    transform:translateX(-50%);
+  
+    width: 30%;
+    height: 30px;
+  
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  
+    color: white;
+    background-color: #3472b9;
+    font-family: "consolas";
+    outline-style: none;
+    border-style: none;
+    border-radius: 5px;
+
+    text-decoration : none;
+    line-height : 30px;
+  
+    cursor: pointer;
+  
+    transition: background-color 0.6s ease;
+  }
+  
+  .taskUploadButton:hover {
+    background-color: #144680;
+    text-decoration : none;
+    color : white;
+  }

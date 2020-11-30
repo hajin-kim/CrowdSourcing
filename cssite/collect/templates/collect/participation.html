@@ -58,27 +58,6 @@
             </tbody>
 
         </table>         
-
-
-
-
-
-
-
-        <!--
-        <p>태스크 이름-제출한 파일 수-상세조회</p>
-        <ul>
-        {% for participate in participations %}
-            {% if participate.admission %}
-            <li>
-                <a href="{% url 'collect:task-detail' participate.task.id %}">{{ participate.task.name }}</a>
-                {{ participate.submit_count }}
-                <a href="{% url 'collect:submitted-parsedfiles' participate.task.id %}">상세조회</a>
-            </li>
-            {% endif %}
-        {% endfor %}
-        </ul>
-    -->
     
     </div>
 </div>

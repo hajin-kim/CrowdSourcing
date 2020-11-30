@@ -121,3 +121,132 @@
   .taskCreateTable td{
     color : black;
   }
+
+
+  /* 태스크 선택화면 */
+  #taskSelectMainDiv {
+    position : relative;
+
+    width : 1200px;
+
+    height : 1000px;
+
+    margin : 0 auto;
+
+  }
+
+  #taskSelectInfoDiv {
+    position : absolute;
+
+    top : 80px;
+    left: 25px;
+
+    width : 800px;
+    height : 250px;
+    margin: 0 auto;
+
+    display:inline-block;
+
+    border : 2px solid #222;
+    border-radius : 10px;
+    background-color : #222;
+  }
+
+  #taskSelectAttributeDiv {
+    position : absolute;
+
+    top : 350px;
+    left : 25px;
+
+    width : 800px;
+    height : 130px;
+    margin: 0 auto;
+
+    display:inline-block;
+
+    border : 2px solid #222;
+    border-radius : 10px;
+    background-color : #222;
+  }
+
+  #taskSelectSchemaDiv {
+    position : absolute;
+
+    top : 80px;
+    left : 850px;
+
+    width : 300px;
+    height : 400px;
+    margin: 0 auto;
+
+    display:inline-block;
+
+    border : 2px solid #222;
+    border-radius : 10px;
+    background-color : #222;
+  }
+
+  #taskSelectSubmitterDiv {
+    position : absolute;
+
+    top : 530px;
+    left: 25px;
+
+    width : 500px;
+    height : 300px;
+    margin: 0 auto;
+
+    display:inline-block;
+
+    border : 2px solid #222;
+    border-radius : 10px;
+    background-color : #222;
+  }
+
+  #taskSelectParticipationDiv {
+    position : absolute;
+
+    top : 530px;
+    right : 25px;
+
+    width : 600px;
+    height : 300px;
+    margin: 0 auto;
+
+    display:inline-block;
+
+    border : 2px solid #222;
+    border-radius : 10px;
+    background-color : #222;
+  }
+
+  .taskButton {
+    position: absolute;
+  
+    width: 20%;
+    height: 30px;
+  
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  
+    color: white;
+    background-color: #3472b9;
+    font-family: "consolas";
+    outline-style: none;
+    border-style: none;
+    border-radius: 5px;
+
+    text-decoration : none;
+    line-height : 30px;
+  
+    cursor: pointer;
+  
+    transition: background-color 0.6s ease;
+  }
+  
+  .taskButton:hover {
+    background-color: #144680;
+    text-decoration : none;
+    color : white;
+  }

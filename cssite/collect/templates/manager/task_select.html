@@ -1,6 +1,104 @@
 {% extends 'collect/manager.html' %}
-
 {% block main_content %}
+<div id="taskSelectMainDiv">
+  <p class="taskCreateText">{{ task.name }}</p>
+ 
+  <div id="taskSelectInfoDiv">
+    <p class="taskCreateText" style="font-size:20px;">태스크 정보</p>
+    
+    <table class="taskCreateTable">
+      <thead>
+        <tr>
+          <th>태스크 이름</th>
+          <th>최소 업로드 주기</th>
+          <th>태스크 설명</th>
+          <th>원본 데이터 설명</th>
+          <th>PASS 된 튜플 수</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ task.name }}</td>
+          <td>{{ task.minimal_upload_frequency }}</td>
+          <td>{{ task.description }}</td>
+          <td>{{ task.original_data_description }}</td>
+          <td>{{ num_of_tuples }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <a class="taskButton" href="./download" style="top:160px;left:20px;">데이터 다운로드</a>
+    <a class="taskButton" href="{% url 'parsedfile list' task.id %}" style="width:25%;top:160px;left:210px;">파싱 데이터 시퀀스 파일</a>
+    <a class="taskButton" href="./attribute" style="top:160px;left:435px">속성 관리</a>
+    <a class="taskButton" href="./derived_schema" style="top:160px;left:620px;">파생 스키마 관리</a>
+
+
+
+  </div>
+
+  <div id="taskSelectAttributeDiv">
+    <p class="taskCreateText" style="font-size:20px;">속성 목록</p>
+    {{ task_attributes|linebreaks }}
+  </div>
+
+  <div id="taskSelectSchemaDiv">
+    <p class="taskCreateText" style="font-size:20px;">파생 스키마 목록</p>
+    {{ task_derived_schemas|linebreaks }}
+  </div>
+
+  <div id="taskSelectSubmitterDiv">
+    <p class="taskCreateText" style="font-size:20px;">제출자 목록</p>
+    {% for participation_participant in part_in %}
+
+    <table class="taskCreateTable" style="min-width:300px;max-width:300px;">
+      <thead>
+        <tr>
+          <th>제출자 ID</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{participation_participant.account}}</td>
+        </tr>
+      </tbody>
+
+    </table>
+    {% endfor %}
+  </div>
+
+  <div id="taskSelectParticipationDiv">
+    <p class="taskCreateText" style="font-size:20px;">참여 신청자 목록</p>
+
+    {% for participation_waiting in applied %}
+
+    <table class="taskCreateTable" style="min-width:500px;max-width:500px;">
+      <thead>
+        <tr>
+          <th>참여 신청자 ID</th>
+          <th>참여 승인</th>
+          <th>참여 거절</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{participation_waiting.account}}</td>
+          <td><a href = "{% url 'acknowledge participation' participation_waiting.id %}" style="color:rgb(48, 66, 146)">참여 승인</a></td>
+          <td><a href = "{% url 'delete participation' participation_waiting.id %}" style="color:rgb(126, 21, 17)">참여 거절</a></td>
+        </tr>
+      </tbody>
+
+    </table>
+    {% endfor %}
+
+
+  </div>
+
+
+
+  
+</div>
+{% endblock main_content %}
+<!--
   <h2>{{ task.name }}</h2>
   
   <h3>태스크 정보</h3>
@@ -45,6 +143,6 @@
       파생 스키마 관리
     </a>
   </div>
-{% endblock main_content %}
+-->
 
 
