@@ -1,0 +1,110 @@
+  #mainDiv {
+    position : relative;
+
+    width : 1250px;
+    height : 450px;
+
+    margin : 0 auto;
+  }
+ 
+ 
+  #taskDiv1 {
+    position : absolute;
+
+    left: 0px;
+
+    width : 600px;
+    height : 400px;
+    margin: 0 auto;
+
+    display:inline-block;
+
+  }
+
+  #taskDiv2 {
+    position : absolute;
+
+    right: 0px;
+
+    width : 600px;
+    height : 400px;
+    margin: 0 auto;
+
+    display:inline-block;
+
+  }
+
+  .taskInfoText {
+    color : white;
+    font-size : 32px;
+    text-align : center;
+  }
+
+  .taskInfoTable {
+    position : absolute;
+    border-collapse : collapse;
+  
+    width: 100%;
+    min-width : 400px;
+    max-width : 600px;
+    
+    font-size : 14px;
+    
+    background-color : #F2F2F2;
+  
+    left : 50%;
+    transform:translateX(-50%);
+  }
+  .taskInfoTable td, .taskInfoTable th {
+    border: 1px solid #BBBBBB;
+    padding : 8px;
+    text-align : center;
+  }
+  .taskInfoTable th{
+    background-color : #333;
+    color : #FFF;
+  }
+  
+  .taskInfoTable td{
+    color : black;
+  }
+
+
+
+
+  /* 관리자용 제출자 정보 */
+  #mainDivManage {
+    position : relative;
+
+    width : 1250px;
+    height : 450px;
+
+    margin : 0 auto;
+  }
+ 
+ 
+  #taskDiv1Manage {
+    position : absolute;
+
+    left: 0px;
+
+    width : 600px;
+    height : 400px;
+    margin: 0 auto;
+
+    display:inline-block;
+
+  }
+
+  #taskDiv2Manage {
+    position : absolute;
+
+    right: 0px;
+
+    width : 600px;
+    height : 400px;
+    margin: 0 auto;
+
+    display:inline-block;
+
+  }

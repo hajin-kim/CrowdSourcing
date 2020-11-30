@@ -1,8 +1,24 @@
 {% extends 'collect/submitter.html' %}
 {% block main_content %}
-    <h1>태스크 정보</h1>
-    <p>태스크 이름: {{ task.name }}</p>
-    <p>최소 업로드 주기: {{ task.minimal_upload_frequency }}</p>
-    <p>태스크 설명: {{ task.description }}</p>
-    <p>원본 데이터 설명: {{ task.original_data_description }}</p>
+<div id="taskDetailDiv">
+    <p class="taskListText">태스크 정보</p>
+    <table class="taskListTable">
+        <thead>
+            <tr>
+                <th>태스크 이름</th>
+                <th>최소 업로드 주기</th>
+                <th>태스크 설명</th>
+                <th>원본 데이터 설명</th>
+            </tr>
+        </thead>
+        <tbody>
+            <td>{{ task.name }}</td>
+            <td>{{ task.minimal_upload_frequency }}</td>
+            <td>{{ task.description }}</td>
+            <td>{{ task.original_data_description }}</td>
+        </tbody>
+
+
+    </table>
+</div>
 {% endblock main_content %}

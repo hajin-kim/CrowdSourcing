@@ -1,12 +1,36 @@
 {% extends 'collect/manager.html' %}
-
 {% block main_content %}
-  <h2>태스크 생성</h2>
+
+<div id="taskCreateDiv">
+  <p class="taskCreateText">태스크 생성</p>
+
   <form method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-      {{ create_task_form }}
-      <button type="submit">생성</button>
+    {% csrf_token %}
+    <!-- 순석 작업하던 부분
+    <p class="taskCreateSubText">태스크 이름</p>
+    <input class="taskCreateInputForm" type="taskname" style="top:0px;">
+                  
+
+    <p class="taskCreateSubText">최소 업로드 주기</p>
+    <input class="taskCreateInputForm" type="minimalupload" style="top:35px;">
+      
+
+    <p class="taskCreateSubText">태스크 설명</p>
+    <input class="taskCreateInputForm" type="taskinfo" style="top:70px;">
+      
+
+    <p class="taskCreateSubText">원본 데이터 설명</p>
+    <input class="taskCreateInputForm" type="origindatainfo" style="top:105px;">
+    
+    
+    <input class="taskCreateButton" type="submit" value="생성" style="top:140px">
+    -->
+
+    {{ create_task_form }}
+    <input class="taskCreateButton" type="submit" value="생성" style="top:140px">
   </form>
+
+</div>
 {% endblock main_content %}
 
 
