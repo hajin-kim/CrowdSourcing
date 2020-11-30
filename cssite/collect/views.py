@@ -67,7 +67,7 @@ def signup(request):
                 return redirect(reverse('manager:list'))
         else:
             context.update({'error': "비밀번호가 일치하지 않습니다."})
-    return render(request, 'collect/signup.html', context)
+            return render(request, 'collect/signup.html', context)
 
 
 # 로그인

@@ -1,6 +1,35 @@
 {% extends 'collect/manager.html' %}
+{% block main_content %}    
 
-{% block main_content %}      
+<div id="taskListDivManage">
+  <p class="taskCreateText">태스크 목록</p>
+  <table class="taskCreateTable">
+    <thead>
+      <tr>
+        <th>태스크 이름</th>
+        <th>최소 업로드 주기</th>
+        <th>활성 상태</th>
+        <th>태스크 설명</th>
+        <th>원본 데이터 설명</th>
+        <th>상세 조회 및 관리</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for task in list_of_tasks %}
+      <tr>
+        <td>{{task.name}}</td>
+        <td>{{task.minimal_upload_frequency}}</td>
+        <td>{{task.activation_state}}</td>
+        <td>{{task.description}}</td>
+        <td>{{task.original_data_description}}</td>
+        <td><a href = "{% url 'show task' task.id %}" style="color:rgb(48, 66, 146)">상세 조회 및 관리</a><br></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+  <!--
   <h2>태스크 목록</h2>
   {% for task in list_of_tasks %}
   <h4>{{task.name}}</h4>
@@ -17,5 +46,6 @@
           태스크 생성
       </a>
   </div>
+-->
 {% endblock main_content %}
 

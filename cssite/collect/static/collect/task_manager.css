@@ -1,0 +1,123 @@
+  #taskCreateDiv {
+    position : relative;
+
+    width : 600px;
+    height : 450px;
+
+    margin : 0 auto;
+
+  }
+
+  #taskDetailDivManage {
+    position : relative;
+
+    width : 800px;
+    height : 450px;
+
+    margin : 0 auto;
+  }
+
+  #taskListDivManage {
+    position : relative;
+
+    min-width : 600px;
+    max-width : 1000px;
+
+    min-height : 500px;
+    max-height : 1000px;
+
+    margin : 0 auto;
+  }
+
+  .taskCreateText {
+    color : white;
+    font-size : 32px;
+    text-align : center;
+  }
+
+  .taskCreateSubText {
+    position:absolute;
+    left : 25%;
+    color : white;
+    font-size : 16px;
+    text-align : left;
+  }
+
+  .taskCreateInputForm {
+    position: absolute;
+    right : 20%;
+  
+    width: 30%;
+    height: 30px;
+  
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  
+    background-color:white;
+    font-family: "consolas";
+    outline-style: none;
+    border-style: none;
+    border-radius: 5px;
+  }
+
+  .taskCreateButton {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  
+    width: 30%;
+    height: 30px;
+  
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  
+    color: white;
+    background-color: #3472b9;
+    font-family: "consolas";
+    outline-style: none;
+    border-style: none;
+    border-radius: 5px;
+  
+    cursor: pointer;
+    text-decoration : none;
+  
+    transition: background-color 0.6s ease;
+  }
+  
+  .taskCreateButton:hover {
+    background-color: #144680;
+  }
+
+
+  /* 테이블 생성 */
+
+  .taskCreateTable {
+    position : absolute;
+    border-collapse : collapse;
+  
+    width: 100%;
+    min-width : 600px;
+    max-width : 1000px;
+    
+    font-size : 14px;
+    
+    background-color : #F2F2F2;
+  
+    left : 50%;
+    transform:translateX(-50%);
+  }
+  .taskCreateTable td, .taskCreateTable th {
+    border: 1px solid #BBBBBB;
+    padding : 8px;
+    text-align : center;
+  }
+  .taskCreateTable th{
+    background-color : #333;
+    color : #FFF;
+  }
+  
+  .taskCreateTable td{
+    color : black;
+  }
