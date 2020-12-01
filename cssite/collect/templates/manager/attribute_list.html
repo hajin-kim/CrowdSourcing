@@ -1,6 +1,18 @@
 {% extends 'collect/manager.html' %}
 
 {% block main_content %}
+
+<div class="commonContainerDiv" style="text-align:center;">
+  <p class="commonTitleText">{{ task_name }}의 속성 목록</p>
+  <p>{{ list_of_attributes|linebreaks }}</p>
+
+  <div style="text-align:center;">
+    <a href="./create">속성 생성하기</a>
+  </div>
+</div>
+
+
+<!--
   <h2>list attributes of "{{ task_name }}"</h2>
   {{ list_of_attributes|linebreaks }}
 
@@ -9,6 +21,7 @@
           create_attribute
       </a>
   </div>
+-->
 {% endblock main_content %}
 
   

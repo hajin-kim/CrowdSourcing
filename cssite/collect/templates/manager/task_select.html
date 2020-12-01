@@ -36,12 +36,12 @@
 
   </div>
 
-  <div id="taskSelectAttributeDiv">
+  <div id="taskSelectAttributeDiv" style="text-align:center;">
     <p class="taskCreateText" style="font-size:20px;">속성 목록</p>
-    {{ task_attributes|linebreaks }}
+    <p style="text-align:center">{{ task_attributes }}</p>
   </div>
 
-  <div id="taskSelectSchemaDiv">
+  <div id="taskSelectSchemaDiv" style="text-align:center;">
     <p class="taskCreateText" style="font-size:20px;">파생 스키마 목록</p>
     {{ task_derived_schemas|linebreaks }}
   </div>

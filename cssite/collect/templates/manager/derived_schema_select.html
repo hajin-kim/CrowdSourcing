@@ -1,6 +1,23 @@
 {% extends 'collect/manager.html' %}
-
 {% block main_content %}
+
+<div class="commonContainerDiv" style="text-align:center;">
+<p class="commonTitleText">태스크 {{ task_name }} 의 파생 스키마 {{ schema_name }}</p>
+
+<p class="commonTitleText" style="font-size:20px;">현재 스키마 정보</p>
+<p class="commonTitleText" style="font-size:16px;">{{ schema_info }}</p>
+
+<p class="commonTitleText" style="font-size:20px;">매핑 정보 목록</p>
+<p class="commonTitleText" style="font-size:16px;">{{ mapping_pairs|linebreaks }}</p>
+
+<div>
+  <a href="./pair">
+      매핑 정보 관리
+  </a>
+</div>
+
+</div>
+<!--
   <h2>"{{ schema_name }}" @"{{ task_name }}"</h2>
   {{ schema_info }}
   <h3>매핑 정보 목록</h3>
@@ -11,6 +28,7 @@
           매핑 정보 관리
       </a>
   </div>
+-->
 {% endblock main_content %}
 
 

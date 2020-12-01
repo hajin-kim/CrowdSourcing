@@ -1,6 +1,22 @@
 {% extends 'collect/manager.html' %}
 
 {% block main_content %}
+
+<div class="commonContainerDiv">
+<p class="commonTitleText">속성 생성하기</p>
+  <div style="text-align:center;">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ create_attribute_form }}
+      <button type="submit">create</button>
+    </form>
+
+    <p class="commonTitleText" style="font-size:20px;">현재 속성 목록</p>
+    {{ list_of_attributes|linebreaks }}
+  </div>
+
+</div>
+<!--
   <h2>Give your attribute</h2>
   <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
@@ -8,6 +24,7 @@
       <button type="submit">create</button>
   </form>
   {{ list_of_attributes|linebreaks }}
+-->
 {% endblock main_content %}
 
   
