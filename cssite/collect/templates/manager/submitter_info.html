@@ -46,7 +46,7 @@
                 {% if participate.admission %}
                 <td><a href="{% url 'collect:task-detail' participate.task.id %}" style="color:rgb(48, 66, 146)">{{ participate.task.name }}</a></td>
                 <td>{{ participate.submit_count }}</td>
-                <td><a href="{% url 'collect:submitted-parsedfiles' participate.task.id %}" style="color:rgb(48, 66, 146)">상세조회</a></td>
+                <td><a href="{% url 'submitted-parsedfiles' participate.task.id user.id %}" style="color:rgb(48, 66, 146)">상세조회</a></td>
                 {% endif %}
                 {% endfor %}
             </tbody>

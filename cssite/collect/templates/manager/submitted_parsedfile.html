@@ -1,5 +1,39 @@
 {% extends 'collect/manager.html' %}
 {% block main_content %}
+<div class="commonContainerDiv">
+    <p class="commonTitleText">제출한 파일 목록</p>
+    <pre class="commonTitleText" style="font-size:20px;">태스크 이름 : {{ task.name }}        저장된 Tuple 수 : {{ total_tuple }}</pre>
+
+    <table class="commonTable">
+        <thead>
+          <tr>
+            <th>파일 명</th>
+            <th>회차</th>
+            <th>기간</th>
+            <th>평가 점수</th>
+            <th>PASS 상태</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for parsedfile in parsedfile_list %}
+          <tr>
+            <td>{{ parsedfile }}</td>
+            <td>{{ parsedfile.submit_number }}</td>
+            <td>{{ parsedfile.start_date }} ~ {{ parsedfile.end_date }}</td>
+            <td>{{ parsedfile.grading_score }}</td>
+            <td>{{ parsedfile.pass_state }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+    
+      </table>
+  
+
+
+
+</div>
+<!--
+
     <h1>제출한 파일 목록</h1>
     태스크 이름: {{ task.name }}<br>
     저장된 tuple 수: {{ total_tuple }}
@@ -12,6 +46,5 @@
         </li>
     {% endfor %}
     </ul>
+-->
 {% endblock main_content %}
-
-
