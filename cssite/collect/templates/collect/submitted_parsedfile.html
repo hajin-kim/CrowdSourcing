@@ -1,7 +1,7 @@
 {% extends 'collect/submitter.html' %}
 {% block main_content %}
 
-<div id="taskParseMainDivSubmit">
+<div id="taskParseMainDivSubmit" style="height:700px;">
     <p class="taskListText">제출한 파일 목록</p>
     <pre class="taskParseText">태스크 이름 : {{ task.name }}        저장된 Tuple 수 : {{ total_tuple }}</pre>
 
@@ -31,7 +31,7 @@
         
           </table>
     </div>
-    <div id=taskUploadDivSubmit>
+    <div id="taskUploadDivSubmit" style="width:600px;height:300px;">
         <p class="taskParseText">파일 업로드</p>
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
