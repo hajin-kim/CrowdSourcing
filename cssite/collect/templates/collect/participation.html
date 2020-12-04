@@ -17,17 +17,21 @@
             </thead>
             <tbody>
               {% for participate in participations %}
+              <tr>
                 {% if not participate.admission %}
-                <td> <a href="{% url 'collect:task-detail' participate.task.id %}" style="color:rgb(48, 66, 146)">{{ participate.task.name }}</a></td>
-                <td>참여 신청 중</td>
-                <td>
-                    {% if request.user.is_superuser %}
-                        <a href="{% url 'collect:delete-participation' participate.id %}">승인</a>
-                    {% else %}
-                        <a href="{% url 'collect:delete-participation' participate.id %}" style="color:rgb(48, 66, 146)">취소</a>
-                    {% endif %}
-                </td>
+                
+                    <td> <a href="{% url 'collect:task-detail' participate.task.id %}" style="color:rgb(48, 66, 146)">{{ participate.task.name }}</a></td>
+                    <td>참여 신청 중</td>
+                    <td>
+                        {% if request.user.is_superuser %}
+                            <a href="{% url 'collect:delete-participation' participate.id %}">승인</a>
+                        {% else %}
+                            <a href="{% url 'collect:delete-participation' participate.id %}" style="color:rgb(48, 66, 146)">취소</a>
+                        {% endif %}
+                    </td>
+                
                 {% endif %}
+                </tr>
                 {% endfor %}
             </tbody>
 
@@ -49,11 +53,13 @@
             </thead>
             <tbody>
               {% for participate in participations %}
+              <tr>
                 {% if participate.admission %}
                 <td><a href="{% url 'collect:task-detail' participate.task.id %}" style="color:rgb(48, 66, 146)">{{ participate.task.name }}</a></td>
                 <td>{{ participate.submit_count }}</td>
                 <td><a href="{% url 'collect:submitted-parsedfiles' participate.task.id %}" style="color:rgb(48, 66, 146)">상세조회</a></td>
                 {% endif %}
+            </tr>
                 {% endfor %}
             </tbody>
 

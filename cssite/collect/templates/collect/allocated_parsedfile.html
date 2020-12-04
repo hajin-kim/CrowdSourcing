@@ -36,6 +36,7 @@
               <tr>
                 <th>태스크 명</th>
                 <th>파일 명</th>
+                <th>평가 종료 날짜</th>
                 <th>평가하기</th>
               </tr>
             </thead>
@@ -44,10 +45,11 @@
               <tr>
                 <td>{{ parsedfile.task.name }}</td>
                 <td>{{ parsedfile }}</td>
+                <td>{{ parsedfile.grading_end_date }}</td>
                 {% if parsedfile.grading_end_date > now %}
                 <td><a href="{% url 'collect:grade-parsedfile' parsedfile.id %}" style="color:rgb(48, 66, 146)">평가하기</a></td>
                 {% else %}
-                    평가 기간 만료
+                  <td>평가 기간 만료</td>
                 {% endif %}
                 
                 </tr>

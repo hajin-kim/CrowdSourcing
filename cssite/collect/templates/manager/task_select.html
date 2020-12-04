@@ -48,8 +48,6 @@
 
   <div id="taskSelectSubmitterDiv">
     <p class="taskCreateText" style="font-size:20px;">제출자 목록</p>
-    {% for participation_participant in part_in %}
-
     <table class="taskCreateTable" style="min-width:300px;max-width:300px;">
       <thead>
         <tr>
@@ -57,19 +55,20 @@
         </tr>
       </thead>
       <tbody>
+        {% for participation_participant in part_in %}
         <tr>
           <td>{{participation_participant.account}}</td>
         </tr>
+      {% endfor %}
       </tbody>
 
     </table>
-    {% endfor %}
   </div>
 
   <div id="taskSelectParticipationDiv">
     <p class="taskCreateText" style="font-size:20px;">참여 신청자 목록</p>
 
-    {% for participation_waiting in applied %}
+    
 
     <table class="taskCreateTable" style="min-width:500px;max-width:500px;">
       <thead>
@@ -80,15 +79,17 @@
         </tr>
       </thead>
       <tbody>
+        {% for participation_waiting in applied %}
         <tr>
           <td>{{participation_waiting.account}}</td>
           <td><a href = "{% url 'acknowledge participation' participation_waiting.id %}" style="color:rgb(48, 66, 146)">참여 승인</a></td>
           <td><a href = "{% url 'delete participation' participation_waiting.id %}" style="color:rgb(126, 21, 17)">참여 거절</a></td>
         </tr>
+        {% endfor %}
       </tbody>
 
     </table>
-    {% endfor %}
+    
 
 
   </div>
