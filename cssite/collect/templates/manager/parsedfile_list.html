@@ -3,42 +3,42 @@
 {% block main_content %}
 
 <div class="commonContainerDiv">
-    <p class="commonTitleText">파싱 데이터 시퀀스 파일 목록</p>
-    <p class="commonTitleText" style="font-size:20px;">현재 제출된 파싱 데이터 시퀀스 파일 수: {{ count }}</p>
+  <p class="commonTitleText">파싱 데이터 시퀀스 파일 목록</p>
+  <p class="commonTitleText" style="font-size:20px;">현재 제출된 파싱 데이터 시퀀스 파일 수: {{ count }}</p>
 
-    <table class="commonTable">
-        <thead>
-            <tr>
-                <th>파일 명</th>
-                <th>배정 상태</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for parsedfile in parsedfiles %}
-            <tr>
-                <td>{{ parsedfile }} </td>
-                {% if parsedfile.grader %}
-                     <td>배정 완료</td>
-                    {% else %}
-                     <td><a href="{% url 'grader list' parsedfile.id %}" style="color:rgb(48, 66, 146)">평가자 배정</a></td>
-                {% endif %}
-            </tr>
-            {% endfor %}
-        </tbody>
+  <table class="commonTable">
+    <thead>
+      <tr>
+        <th>파일 명</th>
+        <th>배정 상태</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for parsedfile in parsedfiles %}
+        <tr>
+          <td>{{ parsedfile }} </td>
+          {% if parsedfile.grader %}
+            <td>배정 완료</td>
+          {% else %}
+            <td><a href="{% url 'grader list' parsedfile.id %}" style="color:rgb(48, 66, 146)">평가자 배정</a></td>
+          {% endif %}
+        </tr>
+      {% endfor %}
+    </tbody>
 
-    </table>
+  </table>
 
 </div>
  <!--
-    <ul>
-    {% for parsedfile in parsedfiles %}
-        {% if parsedfile.grader %}
-            <li>{{ parsedfile }} 배정 완료</li>
-        {% else %}
-            <li>{{ parsedfile }} <a href="{% url 'grader list' parsedfile.id %}">평가자 배정</a></li>
-        {% endif %}
-    {% endfor %}
-    </ul>
+  <ul>
+  {% for parsedfile in parsedfiles %}
+    {% if parsedfile.grader %}
+      <li>{{ parsedfile }} 배정 완료</li>
+    {% else %}
+      <li>{{ parsedfile }} <a href="{% url 'grader list' parsedfile.id %}">평가자 배정</a></li>
+    {% endif %}
+  {% endfor %}
+  </ul>
 -->
 
 {% endblock main_content %}

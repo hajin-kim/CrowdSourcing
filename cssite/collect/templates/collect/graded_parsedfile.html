@@ -43,19 +43,19 @@
           </thead>
           <tbody>
             {% for parsedfile in parsedfiles %}
-            <tr>
-              <td>{{ parsedfile.task.name }}</td>
-              <td>{{ parsedfile }}</td>
-              <td>{{ parsedfile.grade_date }}</td>
-              <td>{{ parsedfile.grading_score }}</td>
-             <td>
-              {% if parsedfile.pass_state %}
-                    Pass
-                {% else %}
-                    NonPass
-                {% endif %}
-             </td>
-            </tr>
+              <tr>
+                <td>{{ parsedfile.task.name }}</td>
+                <td>{{ parsedfile }}</td>
+                <td>{{ parsedfile.grade_date }}</td>
+                <td>{{ parsedfile.grading_score }}</td>
+              <td>
+                {% if parsedfile.pass_state %}
+                      Pass
+                  {% else %}
+                      NonPass
+                  {% endif %}
+              </td>
+              </tr>
             {% endfor %}
           </tbody>
       

@@ -6,9 +6,31 @@
   <p class="commonTitleText">{{ task_name }}의 속성 목록</p>
   <p>{{ list_of_attributes|linebreaks }}</p>
 
+  <p class="commonTitleText">속성 생성하기</p>
+  <div style="text-align:center;">
+    <form class="form-create-attribute" action="{% url 'create attribute' task_id %}" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% comment %} 
+        'attr'
+      {% endcomment %}
+
+      <p class="createAttributeText" style="top:225px;">컬럼 이름</p>
+      <input class="createAttributeInput" type="text" name="attr" style="top:130px;" required>
+      {% comment %} tag: placeholder="ID를 입력하세요" {% endcomment %}
+
+      <button type="submit">생성</button>
+    </form>
+    {% comment %} 
+    <p class="commonTitleText" style="font-size:20px;">현재 속성 목록</p>
+    {{ list_of_attributes|linebreaks }}
+    {% endcomment %}
+  </div>
+
+  {% comment %}
   <div style="text-align:center;">
     <a href="./create">속성 생성하기</a>
   </div>
+  {% endcomment %}
 </div>
 
 

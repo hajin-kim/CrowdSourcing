@@ -3,43 +3,43 @@
 
 
 <div class="commonContainerDiv">
-    <p class="commonTitleText">평가자 목록</p>
+  <p class="commonTitleText">평가자 목록</p>
 
-    <table class="commonTable">
-        <thead>
-            <tr>
-                <th>아이디</th>
-                <th>이름</th>
-                <th>배정된 파일 수</th>
-                <th>배정하기</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for grader in graders %}
-            <tr>
-               <td>{{ grader.user.username }}</td>
-               <td>{{ grader.name }}</td>
-               <td>{{ grader.parsed_grades.all|length }} </td>
-               <td><a href="{% url 'allocate file' file_id grader.id %}" style="color:rgb(48, 66, 146)">배정하기</a></td>
-            </tr>
-            {% endfor %}
-        </tbody>
+  <table class="commonTable">
+    <thead>
+      <tr>
+        <th>아이디</th>
+        <th>이름</th>
+        <th>배정된 파일 수</th>
+        <th>배정하기</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for grader in graders %}
+        <tr>
+          <td>{{ grader.user.username }}</td>
+          <td>{{ grader.name }}</td>
+          <td>{{ grader.parsed_grades.all|length }} </td>
+          <td><a href="{% url 'allocate file' file_id grader.id %}" style="color:rgb(48, 66, 146)">배정하기</a></td>
+        </tr>
+      {% endfor %}
+    </tbody>
 
-    </table>
+  </table>
 
 </div>
 
 
 <!--
-    <h3>평가자 목록</h3>
-    아이디 - 이름 - 배정된 파일 수
-    <ul>
-    {% for grader in graders %}
-        <li>
-            {{ grader.user.username }} {{ grader.name }} {{ grader.parsed_grades.all|length }} 
-            <a href="{% url 'allocate file' file_id grader.id %}">배정하기</a>
-        </li>
-    {% endfor %}
-    </ul>
+  <h3>평가자 목록</h3>
+  아이디 - 이름 - 배정된 파일 수
+  <ul>
+  {% for grader in graders %}
+    <li>
+      {{ grader.user.username }} {{ grader.name }} {{ grader.parsed_grades.all|length }} 
+      <a href="{% url 'allocate file' file_id grader.id %}">배정하기</a>
+    </li>
+  {% endfor %}
+  </ul>
 -->
 {% endblock main_content %}

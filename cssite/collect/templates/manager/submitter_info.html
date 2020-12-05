@@ -1,90 +1,93 @@
 {% extends 'collect/manager.html' %}
 {% block main_content %}
 <div id="mainDivManage">
-    <div id="taskDiv1Manage">
+  <div id="taskDiv1Manage">
 
-        <p class="taskInfoText">참여 신청 중인 태스크 목록</p>
+    <p class="taskInfoText">참여 신청 중인 태스크 목록</p>
 
-        <table class="taskInfoTable">
-            <thead>
-                <tr>
-                    <th>태스크 이름</th>
-                    <th>참여 상태</th>
-                    <th>참여 승인</th>
-                    <th>참여 거절</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for participate in participations %}
-                {% if not participate.admission %}
-                <td> <a href="{% url 'collect:task-detail' participate.task.id %}" style="color:rgb(48, 66, 146)">{{ participate.task.name }}</a></td>
-                <td>참여 신청 중</td>
-                <td><a href = "{% url 'acknowledge participation' participate.id %}" style="color:rgb(48, 66, 146)">참여 승인</a></td>
-                <td><a href = "{% url 'delete participation' participate.id %}" style="color:rgb(126, 21, 17)">참여 거절</a></td>
-                {% endif %}
-                {% endfor %}
-            </tbody>
+    <table class="taskInfoTable">
+      <thead>
+        <tr>
+          <th>태스크 이름</th>
+          <th>참여 상태</th>
+          <th>참여 승인</th>
+          <th>참여 거절</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for participate in participations %}
+          {% if not participate.admission %}
+            <tr>
+              <td><a href="{% url 'collect:task-detail' participate.task.id %}" style="color:rgb(48, 66, 146)">{{ participate.task.name }}</a></td>
+              <td>참여 신청 중</td>
+              <td><a href="{% url 'acknowledge participation' participate.id %}" style="color:rgb(48, 66, 146)">참여 승인</a></td>
+              <td><a href="{% url 'delete participation' participate.id %}" style="color:rgb(126, 21, 17)">참여 거절</a></td>
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
 
-        </table>         
-    </div>
+    </table>
+  </div>
+  
+  
+  <div id="taskDiv2Manage">
     
-    
-    <div id="taskDiv2Manage">
-        
-        <p class="taskInfoText">참여 중인 태스크 목록</p>
+    <p class="taskInfoText">참여 중인 태스크 목록</p>
 
-        <table class="taskInfoTable">
-            <thead>
-                <tr>
-                    <th style="background-color:rgb(17, 30, 70)">태스크 이름</th>
-                    <th style="background-color:rgb(17, 30, 70)">제출한 파일 수</th>
-                    <th style="background-color:rgb(17, 30, 70)">상세 조회</th>
-                </tr>
-            </thead>
-            <tbody>
-              {% for participate in participations %}
-                {% if participate.admission %}
-                <td><a href="{% url 'collect:task-detail' participate.task.id %}" style="color:rgb(48, 66, 146)">{{ participate.task.name }}</a></td>
-                <td>{{ participate.submit_count }}</td>
-                <td><a href="{% url 'submitted-parsedfiles' participate.task.id user.id %}" style="color:rgb(48, 66, 146)">상세조회</a></td>
-                {% endif %}
-                {% endfor %}
-            </tbody>
-
-        </table>         
-    
-    </div>
+    <table class="taskInfoTable">
+      <thead>
+        <tr>
+          <th style="background-color:rgb(17, 30, 70)">태스크 이름</th>
+          <th style="background-color:rgb(17, 30, 70)">제출한 파일 수</th>
+          <th style="background-color:rgb(17, 30, 70)">상세 조회</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for participate in participations %}
+          {% if participate.admission %}
+            <tr>
+              <td><a href="{% url 'collect:task-detail' participate.task.id %}" style="color:rgb(48, 66, 146)">{{ participate.task.name }}</a></td>
+              <td>{{ participate.submit_count }}</td>
+              <td><a href="{% url 'submitted-parsedfiles' participate.task.id user.id %}" style="color:rgb(48, 66, 146)">상세조회</a></td>
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  
+  </div>
 </div>
 {% endblock main_content %}
 
 <!--
-    <h1>참여 신청 중인 태스크 목록</h1>
-    <p>태스크 이름-참여 상태-참여 신청</p>
-    <ul>
-    {% for participate in participations %}
-        {% if not participate.admission %}
-        <li>
-            <a href="{% url 'collect:task-detail' participate.task.id %}">{{ participate.task.name }}</a>
-            참여 신청 중
-            <a href = "{% url 'acknowledge participation' participate.id %}"><button>참여 승인</button></a>
-            <a href = "{% url 'delete participation' participate.id %}"><button>참여 거절</button></a>
-        </li>
-        {% endif %}
-    {% endfor %}
-    </ul>
+  <h1>참여 신청 중인 태스크 목록</h1>
+  <p>태스크 이름-참여 상태-참여 신청</p>
+  <ul>
+  {% for participate in participations %}
+    {% if not participate.admission %}
+    <li>
+      <a href="{% url 'collect:task-detail' participate.task.id %}">{{ participate.task.name }}</a>
+      참여 신청 중
+      <a href = "{% url 'acknowledge participation' participate.id %}"><button>참여 승인</button></a>
+      <a href = "{% url 'delete participation' participate.id %}"><button>참여 거절</button></a>
+    </li>
+    {% endif %}
+  {% endfor %}
+  </ul>
+  
+  <h1>참여 중인 태스크 목록</h1>
+  <p>태스크 이름-제출한 파일 수-상세조회</p>
+  <ul>
+  {% for participate in participations %}
+    {% if participate.admission %}
+    <li>
+      <a href="{% url 'collect:task-detail' participate.task.id %}">{{ participate.task.name }}</a>
+      {{ participate.submit_count }}
+      <a href="{% url 'submitted-parsedfiles' participate.task.id user.id %}">상세조회</a>
+    </li>
+    {% endif %}
+  {% endfor %}
+  </ul>
     
-    <h1>참여 중인 태스크 목록</h1>
-    <p>태스크 이름-제출한 파일 수-상세조회</p>
-    <ul>
-    {% for participate in participations %}
-        {% if participate.admission %}
-        <li>
-            <a href="{% url 'collect:task-detail' participate.task.id %}">{{ participate.task.name }}</a>
-            {{ participate.submit_count }}
-            <a href="{% url 'submitted-parsedfiles' participate.task.id user.id %}">상세조회</a>
-        </li>
-        {% endif %}
-    {% endfor %}
-    </ul>
-        
 -->

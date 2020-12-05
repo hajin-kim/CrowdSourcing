@@ -97,21 +97,21 @@ H.K.
           </thead>
           <tbody>
             {% for account in accounts %}
-             {% if account.role != "관리자" %}
-             <tr>
-               <td>{{ account.role }}</td>
-               <td> {{ account.user.username }}</td>
-               <td>{{ account.birth }}</td>
-               <td>{{ account.gender }}</td>
-               <td>{% for participation in account.participations.all %}
-                {% if participation.admission %}
-                    {{ participation.task.name }} 
-                {% endif %}
-                 {% endfor %}</td>
-               <td> <a href="{% url 'collect:user-detail' account.user.id %}" style="color:rgb(48, 66, 146)">상세조회</a> </td>
-             </tr>
-              
-            {% endif %}
+              {% if account.role != "관리자" %}
+                <tr>
+                  <td>{{ account.role }}</td>
+                  <td> {{ account.user.username }}</td>
+                  <td>{{ account.birth }}</td>
+                  <td>{{ account.gender }}</td>
+                  <td>
+                    {% for participation in account.participations.all %}
+                      {% if participation.admission %}
+                        {{ participation.task.name }} 
+                      {% endif %}
+                    {% endfor %}</td>
+                  <td> <a href="{% url 'collect:user-detail' account.user.id %}" style="color:rgb(48, 66, 146)">상세조회</a> </td>
+                </tr>
+              {% endif %}
             {% endfor %}
           </tbody>
 

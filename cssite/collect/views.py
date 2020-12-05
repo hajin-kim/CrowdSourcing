@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 
 from .models import Account, Task, Participation, ParsedFile, SchemaAttribute, MappingInfo, MappingPair
-from .forms import LoginForm, GradeForm, SchemaChoiceForm, UploadForm, CreateTask, CreateSchemaAttribute, CreateMappingInfo, CreateMappingPair
+from .forms import LoginForm, GradeForm, SchemaChoiceForm, CreateTask, CreateMappingPair
 
 from datetime import date, datetime, timedelta
 import os
@@ -394,6 +394,8 @@ def parsedFileListAndUpload(request, pk):
         # TODO: remove "STRICT_TRANS_TABLES" by set command without this attribute
         # set @@global.sql_mode="ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION";
         
+        return redirect(reverse('collect:submitted-parsedfiles', kwargs={'pk': pk}))
+    
     
     parsedfile_list = user.account.parsed_submits.filter(task=task)
     total_tuple = sum(
@@ -691,16 +693,15 @@ def createTask(request):
 """
 view functions for attribute
 """
-
-
 def listAttributes(request, task_id):
     """
     docstring
     """
-    task = Task.objects.filter(id=task_id)[0]
+    task = Task.objects.get(id=task_id)
     attributes = generateListString(SchemaAttribute.objects.filter(task=task))
     return render(request, 'manager/attribute_list.html', {
         'task_name': task.name,
+        'task_id': task_id,
         'list_of_attributes': attributes,
     })
 
@@ -709,46 +710,31 @@ def createAttribute(request, task_id):
     """
     docstring
     """
-    form = None
-    task = Task.objects.filter(id=task_id)[0]
+    task = Task.objects.get(id=task_id)
     attribute = None
-
     
     # if task.activation_state:
     #     return HttpResponse("<h2>태스크가 활성화되어 있습니다!</h3>")
-    
-    attributes = generateListString(SchemaAttribute.objects.filter(task=task))
 
     if request.method == 'POST':
-        form = CreateSchemaAttribute(request.POST, request.FILES)
-        if form.is_valid():
-            # form = form.save(commit=False) # 중복 DB save를 방지
-            attribute = form.save(task)
-            # attribute.task = task
-            attribute.save()
+        # form = form.save(commit=False) # 중복 DB save를 방지
+        attribute = SchemaAttribute(
+            task=task,
+            attr=request.POST['attr']
+        )
+        # attribute.task = task
+        attribute.save()
 
-            return redirect('create attribute', task_id=task_id)
-
-    else:
-        form = CreateSchemaAttribute()
-
-    return render(request, 'manager/attribute_create.html', {
-        'create_attribute_form': form,
-        'list_of_attributes': attributes,
-    })
-
+    return redirect('list attributes', task_id=task_id)
 
 """
 view functions for derived schema
 """
-
-
 def listDerivedSchemas(request, task_id):
     """
     docstring
     """
-    task = Task.objects.filter(id=task_id)[0]
-
+    task = Task.objects.get(id=task_id)
     derived_schemas = MappingInfo.objects.filter(task=task)
     return render(request, 'manager/derived_schema_list.html', {
         'task_id': task_id,
@@ -761,8 +747,8 @@ def showDerivedSchema(request, task_id, schema_id):
     """
     docstring
     """
-    task = Task.objects.filter(id=task_id)[0]
-    schema = MappingInfo.objects.filter(id=schema_id, task=task)[0]
+    task = Task.objects.get(id=task_id)
+    schema = MappingInfo.objects.get(id=schema_id, task=task)
 
     schema_info = MappingInfo.objects.filter(id=schema_id).values()[0]
     mapping_pairs = generateListString(
@@ -774,30 +760,20 @@ def showDerivedSchema(request, task_id, schema_id):
         'mapping_pairs': mapping_pairs,
     })
 
-
 def createDerivedSchema(request, task_id):
     """
     docstring
     """
-    form = None
     task = Task.objects.filter(id=task_id)[0]
     schema = None
     if request.method == 'POST':
-        form = CreateMappingInfo(request.POST, request.FILES)
-        if form.is_valid():
-            # form = form.save(commit=False) # 중복 DB save를 방지
-            schema = form.save(task)
-            # schema.task = task
-            schema.save()
+        schema = MappingInfo(
+            task=task,
+            derived_schema_name=request.POST['derived_schema_name']
+        )
+        schema.save()
 
-            return redirect('list derived schemas', task_id=task_id)
-
-    else:
-        form = CreateMappingInfo()
-
-    return render(request, 'manager/derived_schema_create.html', {
-        'create_derived_schema_form': form
-    })
+    return redirect('list derived schemas', task_id=task_id)
 
 
 """

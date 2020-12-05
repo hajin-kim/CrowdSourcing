@@ -21,20 +21,19 @@
         </tr>
       </thead>
       <tbody>
-        
-      {% for parsedfile in parsedfile_list %}
-        <tr>
-          <td>{{ parsedfile }}</td>
-          <td>{{ parsedfile.submit_number }}</td>
-          <td>{{ parsedfile.start_date }} ~ {{ parsedfile.end_date }}</td>
-          <td>{{ parsedfile.total_tuple }}</td>
-          <td>{{ parsedfile.duplicated_tuple }}</td>
-          <td>{{ parsedfile.null_ratio }}</td>
-          <td>{{ parsedfile.grading_score }}</td>
-          <td>{{ parsedfile.pass_state }}</td>
-          <td><a href="/collect/allocated-parsedfiles/{{ parsedfile.id }}/download/">다운로드</a></td>
-        </tr>
-      {% endfor %}
+        {% for parsedfile in parsedfile_list %}
+          <tr>
+            <td>{{ parsedfile }}</td>
+            <td>{{ parsedfile.submit_number }}</td>
+            <td>{{ parsedfile.start_date }} ~ {{ parsedfile.end_date }}</td>
+            <td>{{ parsedfile.total_tuple }}</td>
+            <td>{{ parsedfile.duplicated_tuple }}</td>
+            <td>{{ parsedfile.null_ratio }}</td>
+            <td>{{ parsedfile.grading_score }}</td>
+            <td>{{ parsedfile.pass_state }}</td>
+            <td><a href="/collect/allocated-parsedfiles/{{ parsedfile.id }}/download/">다운로드</a></td>
+          </tr>
+        {% endfor %}
       </tbody>
     
       </table>

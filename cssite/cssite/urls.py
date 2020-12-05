@@ -47,6 +47,7 @@ urlpatterns = [
          showDerivedSchema, name='show derived schema'),
     path('task/<int:task_id>/derived_schema/create/',
          createDerivedSchema, name='create derived schema'),
+         
     path('task/<int:task_id>/derived_schema/<int:schema_id>/pair/',
          listMappingPairs, name='list mapping pairs'),
     path('task/<int:task_id>/derived_schema/<int:schema_id>/pair/create',

@@ -15,21 +15,17 @@
           </tr>
         </thead>
         <tbody>
-        {% for parsedfile in parsedfile_list %}
-          <tr>
-            <td>{{ parsedfile }}</td>
-            <td>{{ parsedfile.submit_number }}</td>
-            <td>{{ parsedfile.start_date }} ~ {{ parsedfile.end_date }}</td>
-            <td>{{ parsedfile.grading_score }}</td>
-            <td>{{ parsedfile.pass_state }}</td>
-          </tr>
+          {% for parsedfile in parsedfile_list %}
+            <tr>
+              <td>{{ parsedfile }}</td>
+              <td>{{ parsedfile.submit_number }}</td>
+              <td>{{ parsedfile.start_date }} ~ {{ parsedfile.end_date }}</td>
+              <td>{{ parsedfile.grading_score }}</td>
+              <td>{{ parsedfile.pass_state }}</td>
+            </tr>
           {% endfor %}
         </tbody>
-    
       </table>
-  
-
-
 
 </div>
 <!--

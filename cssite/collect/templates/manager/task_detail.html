@@ -1,25 +1,27 @@
 {% extends 'collect/manager.html' %}
 {% block main_content %}
 <div id="taskDetailDivManage">
-    <p class="taskCreateText">태스크 정보</p>
-    <table class="taskCreateTable">
-        <thead>
-            <tr>
-                <th>태스크 이름</th>
-                <th>최소 업로드 주기</th>
-                <th>태스크 설명</th>
-                <th>원본 데이터 설명</th>
-            </tr>
-        </thead>
-        <tbody>
-            <td>{{ task.name }}</td>
-            <td>{{ task.minimal_upload_frequency }}</td>
-            <td>{{ task.description }}</td>
-            <td>{{ task.original_data_description }}</td>
-        </tbody>
+  <p class="taskCreateText">태스크 정보</p>
+  <table class="taskCreateTable">
+    <thead>
+      <tr>
+        <th>태스크 이름</th>
+        <th>최소 업로드 주기</th>
+        <th>태스크 설명</th>
+        <th>원본 데이터 설명</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{ task.name }}</td>
+        <td>{{ task.minimal_upload_frequency }}</td>
+        <td>{{ task.description }}</td>
+        <td>{{ task.original_data_description }}</td>
+      </tr>
+    </tbody>
 
 
-    </table>
+  </table>
 </div>
 
 {% endblock main_content %}

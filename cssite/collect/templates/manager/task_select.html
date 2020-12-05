@@ -56,10 +56,10 @@
       </thead>
       <tbody>
         {% for participation_participant in part_in %}
-        <tr>
-          <td>{{participation_participant.account}}</td>
-        </tr>
-      {% endfor %}
+          <tr>
+            <td>{{participation_participant.account}}</td>
+          </tr>
+        {% endfor %}
       </tbody>
 
     </table>
@@ -80,11 +80,11 @@
       </thead>
       <tbody>
         {% for participation_waiting in applied %}
-        <tr>
-          <td>{{participation_waiting.account}}</td>
-          <td><a href = "{% url 'acknowledge participation' participation_waiting.id %}" style="color:rgb(48, 66, 146)">참여 승인</a></td>
-          <td><a href = "{% url 'delete participation' participation_waiting.id %}" style="color:rgb(126, 21, 17)">참여 거절</a></td>
-        </tr>
+          <tr>
+            <td>{{participation_waiting.account}}</td>
+            <td><a href = "{% url 'acknowledge participation' participation_waiting.id %}" style="color:rgb(48, 66, 146)">참여 승인</a></td>
+            <td><a href = "{% url 'delete participation' participation_waiting.id %}" style="color:rgb(126, 21, 17)">참여 거절</a></td>
+          </tr>
         {% endfor %}
       </tbody>
 

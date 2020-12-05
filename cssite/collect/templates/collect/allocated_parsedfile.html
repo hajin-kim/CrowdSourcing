@@ -47,19 +47,14 @@
                 <td>{{ parsedfile }}</td>
                 <td>{{ parsedfile.grading_end_date }}</td>
                 {% if parsedfile.grading_end_date > now %}
-                <td><a href="{% url 'collect:grade-parsedfile' parsedfile.id %}" style="color:rgb(48, 66, 146)">평가하기</a></td>
+                  <td><a href="{% url 'collect:grade-parsedfile' parsedfile.id %}" style="color:rgb(48, 66, 146)">평가하기</a></td>
                 {% else %}
                   <td>평가 기간 만료</td>
                 {% endif %}
-                
-                </tr>
+              </tr>
               {% endfor %}
             </tbody>
-        
           </table>
-
-
-
         </div>
 
         <!--
