@@ -72,24 +72,3 @@
 </div>
 
 {% endblock main_content %}
-<!--
-
-  태스크 이름: {{ task.name }}<br>
-  저장된 tuple 수: {{ total_tuple }}
-  <p>파일 이름-회차-기간-평가 점수-패스 여부</p>
-  <ul>
-  {% for parsedfile in parsedfile_list %}
-    <li>
-    {{ parsedfile }} {{ parsedfile.submit_number }} {{ parsedfile.start_date }}~{{ parsedfile.end_date }}
-    {{ parsedfile.grading_score }} {{ parsedfile.pass_state }}
-    </li>
-  {% endfor %}
-  </ul>
-  <h2>Upload file</h2>
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ file_upload_form }}
-    <button type="submit">upload</button>
-  </form>
-
--->

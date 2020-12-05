@@ -18,9 +18,9 @@
           <a class="nav-link active" href="{% url 'collect:participations' %}">내가 참여하고 있는 태스크 목록</a>
           <a class="nav-link active" href="{% url 'collect:tasks' %}">진행 중인 태스크 목록</a>
           
-          <a class="nav-link active" href="{% url 'collect:update' user.id %}">정보 수정</a>
-          <a class="nav-link active" href="{% url 'collect:userinfo' user.id %}">내 정보 조회</a>
-          <a class="nav-link active" href="{% url 'collect:delete' user.id %}">회원 탈퇴</a>
+          {% comment %} 조회에 들어가서 수정할 수 있게 했습니다 H.K. {% endcomment %}
+          {% comment %} <a class="nav-link active" href="{% url 'collect:update' user.id %}">정보 수정</a> {% endcomment %}
+          <a class="nav-link active" href="{% url 'collect:userinfo' user.id %}">내 프로필</a>
           <a class="nav-link active" href="{% url 'collect:logout' %}">로그아웃</a>
           </nav>
       </div>

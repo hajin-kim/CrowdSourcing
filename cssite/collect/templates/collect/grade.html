@@ -1,104 +1,49 @@
-{% load static %}
-<head>
-      
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/sign-in/">
-  <link href="../assets/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
-  <link rel="stylesheet" href = "{% static 'collect/cover.css' %}">
-  <link rel="stylesheet" href = "{% static 'collect/modal.css' %}">
-  <link rel="stylesheet" href = "{% static 'collect/parse.css' %}">
-  <script src="{% static 'collect/login.js' %}" type="text/javascript"></script>
-</head>
-
-<body class = "text">
-  <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
-    <header class="masthead mb-auto">
-      <div class="inner">
-        <h3 class="masthead-brand">데이터베이스</h3>
-        <nav class="nav nav-masthead justify-content-center">
-            <a class="nav-link active" href="{% url 'collect:grader' %}">Home</a>
-            <a class="nav-link active" href="{% url 'collect:logout' %}">로그아웃</a>
-            <a class="nav-link active" href="{% url 'collect:update' user.id %}">정보 수정</a>
-            <a class="nav-link active" href="{% url 'collect:delete' user.id %}">회원 탈퇴</a>
-            <a class="nav-link active" href="{% url 'collect:graded-parsedfiles' %}">내 평가 기록</a>
-            <a class="nav-link active" href="{% url 'collect:allocated-parsedfiles' %}">평가하기</a>
-        </nav>
-      </div>
-    </header>
+{% extends 'collect/grader.html' %}
+{% block main_content %}
+  <div class="commonContainerDiv" style="text-align:center">
     
-    <main role="main" class="inner cover">
-      <div class="commonContainerDiv" style="text-align:center">
-        
-        <div id="gradeFileInfo">
-          <table class="gradeFileInfoTable">
-            <thead>
-              <tr>
-                <th>파일 이름</th>
-                <th>회차</th>
-                <th>기간</th>
-                <th>튜플 수</th>
-                <th>중복 튜플 수</th>
-                <th>Null 비율</th>
-                <th>평가 점수</th>
-                <th>PASS 상태</th>
-                <th>파싱된 파일</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{{ parsedfile }}</td>
-                <td>{{ parsedfile.submit_number }}</td>
-                <td>{{ parsedfile.start_date }} ~ {{ parsedfile.end_date }}</td>
-                <td>{{ parsedfile.total_tuple }}</td>
-                <td>{{ parsedfile.duplicated_tuple }}</td>
-                <td>{{ parsedfile.null_ratio }}</td>
-                <td>{{ parsedfile.grading_score }}</td>
-                <td>{{ parsedfile.pass_state }}</td>
-                <td><a href="/collect/allocated-parsedfiles/{{ parsedfile.id }}/download/">다운로드</a></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        
-        <br>
-        <br>
+    <div id="gradeFileInfo">
+      <table class="CommonTable" style="position:relative;">
+        <thead>
+          <tr>
+            <th>파일 이름</th>
+            <th>회차</th>
+            <th>기간</th>
+            <th>튜플 수</th>
+            <th>중복 튜플 수</th>
+            <th>Null 비율</th>
+            <th>평가 점수</th>
+            <th>PASS 상태</th>
+            <th>파싱된 파일</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ parsedfile }}</td>
+            <td>{{ parsedfile.submit_number }}</td>
+            <td>{{ parsedfile.start_date }} ~ {{ parsedfile.end_date }}</td>
+            <td>{{ parsedfile.total_tuple }}</td>
+            <td>{{ parsedfile.duplicated_tuple }}</td>
+            <td>{{ parsedfile.null_ratio }}</td>
+            <td>{{ parsedfile.grading_score }}</td>
+            <td>{{ parsedfile.pass_state }}</td>
+            <td><a href="/collect/allocated-parsedfiles/{{ parsedfile.id }}/download/">다운로드</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <br>
+    <br>
 
-        <p class="commonTitleText">평가하기</p>
-        <form action="{% url 'collect:grade-parsedfile' parsedfile.id %}" method="post">
-          {% csrf_token %}
-          {{ form.as_p }}
-          <input type="submit" value="평가 완료">
-      </form>
-      {% comment %} <div>
-        <a href="./download">
-          데이터 다운로드
-        </a>
-
-      </div> {% endcomment %}
-
-
-<!--
-      <h2>평가하기</h2>
-      <form action="{% url 'collect:grade-parsedfile' parsedfile.id %}" method="post">
-          {% csrf_token %}
-          {{ form.as_p }}
-          <input type="submit" value="완료">
-      </form>
-      <div>
-        <a href="./download">
-          데이터 다운받기
-        </a>
-      </div>
-    -->
-    </main>
-
-
-    <footer class="mastfoot mt-auto">
-      <div class="inner">
-        <p>김지현 권순석 김하진 이동우 조성현</p>
-      </div>
-    </footer>
+    <p class="commonTitleText">평가하기</p>
+    <form action="{% url 'collect:grade-parsedfile' parsedfile.id %}" method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <input type="submit" value="평가 완료">
+    </form>
   </div>
-    
-</body>
+{% endblock main_content %}
+
+
+

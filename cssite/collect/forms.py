@@ -17,12 +17,12 @@ class GradeForm(forms.ModelForm):
         fields = ['grading_score', 'pass_state']
 
 
-class SchemaChoiceForm(forms.ModelForm):
-    """
-    docstring
-    """
-    task = Task
-    mappingInfo = MappingInfo
+# class SchemaChoiceForm(forms.ModelForm):
+#     """
+#     docstring
+#     """
+#     task = Task
+#     mappingInfo = MappingInfo
 
 
 # class UploadForm(forms.ModelForm):
@@ -111,25 +111,25 @@ class CreateTask(forms.ModelForm):
 #         return self.instance
 
 
-class CreateMappingPair(forms.ModelForm):
-    """
-    docstring
-    """
-    class Meta:
-        model = MappingPair
-        fields = [
-            # 'mapping_info',
-            'schema_attribute',
-            'parsing_column_name',
-        ]
+# class CreateMappingPair(forms.ModelForm):
+#     """
+#     docstring
+#     """
+#     class Meta:
+#         model = MappingPair
+#         fields = [
+#             # 'mapping_info',
+#             'schema_attribute',
+#             'parsing_column_name',
+#         ]
 
-    def save(self, mapping_info, commit=True):
-        self.instance = MappingPair(**self.cleaned_data)
-        # self.instance.task = task
-        self.instance.mapping_info = mapping_info
+#     def save(self, mapping_info, commit=True):
+#         self.instance = MappingPair(**self.cleaned_data)
+#         # self.instance.task = task
+#         self.instance.mapping_info = mapping_info
 
-        if commit:
-            self.instance.save()
-            # self.instance.name = self.instance.file_original.name
-            # self.instance.save()
-        return self.instance
+#         if commit:
+#             self.instance.save()
+#             # self.instance.name = self.instance.file_original.name
+#             # self.instance.save()
+#         return self.instance

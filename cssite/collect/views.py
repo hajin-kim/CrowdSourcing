@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 
 from .models import Account, Task, Participation, ParsedFile, SchemaAttribute, MappingInfo, MappingPair
-from .forms import LoginForm, GradeForm, SchemaChoiceForm, CreateTask, CreateMappingPair
+from .forms import LoginForm, GradeForm, CreateTask
 
 from string import ascii_lowercase
 from random import choice, randint, random
@@ -353,8 +353,8 @@ def parsedFileListAndUpload(request, pk):
         print('keys:', mapping_from_to.keys())
         print('values:', mapping_from_to.values())
         for key in df.columns:
-            if key in mapping_from_to.keys():
-                df.rename(columns={key: mapping_from_to[key]}, inplace=True)
+            if str(key) in mapping_from_to.keys():
+                df.rename(columns={key: mapping_from_to[str(key)]}, inplace=True)
             else:
                 df.drop([key], axis='columns', inplace=True)
         
@@ -723,7 +723,6 @@ def createAttribute(request, task_id):
     docstring
     """
     task = Task.objects.get(id=task_id)
-    attribute = None
     
     # if task.activation_state:
     #     return HttpResponse("<h2>태스크가 활성화되어 있습니다!</h3>")
@@ -797,14 +796,19 @@ def listMappingPairs(request, task_id, schema_id):
     """
     docstring
     """
-    task = Task.objects.filter(id=task_id)[0]
-    derived_schema = MappingInfo.objects.filter(id=schema_id, task=task)[0]
+    task = Task.objects.get(id=task_id)
+    derived_schema = MappingInfo.objects.get(id=schema_id, task=task)
 
     mapping_pairs = generateListString(
         MappingPair.objects.filter(mapping_info=derived_schema))
+    schema_attribute_list = SchemaAttribute.objects.filter(task=task)
+
     return render(request, 'manager/mapping_pair_list.html', {
+        'task_id': task_id,
         'task_name': task.name,
+        'schema_id': schema_id,
         'schema_name': derived_schema.derived_schema_name,
+        'schema_attribute_list': schema_attribute_list,
         'list_of_mapping_pairs': mapping_pairs,
     })
 
@@ -813,28 +817,16 @@ def createMappingPair(request, task_id, schema_id):
     """
     docstring
     """
-    form = None
-    task = Task.objects.filter(id=task_id)[0]
-    derived_schema = MappingInfo.objects.filter(id=schema_id, task=task)[0]
+    task = Task.objects.get(id=task_id)
+    derived_schema = MappingInfo.objects.get(id=schema_id, task=task)
 
-    mapping_pairs = generateListString(
-        MappingPair.objects.filter(mapping_info=derived_schema))
-
-    mapping_pair = None
     if request.method == 'POST':
-        form = CreateMappingPair(request.POST, request.FILES)
-        if form.is_valid():
-            # form = form.save(commit=False) # 중복 DB save를 방지
-            mapping_pair = form.save(derived_schema)
-            # schema.task = task
-            mapping_pair.save()
+        mapping_pair = MappingPair(
+            mapping_info=derived_schema,
+            schema_attribute=SchemaAttribute.objects.get(task=task, attr=request.POST['attr']),
+            parsing_column_name=request.POST['parsing_column_name'],
+        )
+        mapping_pair.save()
 
-            return redirect('create mapping pair', task_id=task_id, schema_id=schema_id)
+    return redirect('list mapping pairs', task_id=task_id, schema_id = schema_id)
 
-    else:
-        form = CreateMappingPair()
-
-    return render(request, 'manager/mapping_pair_create.html', {
-        'create_mapping_pair_form': form,
-        'list_of_mapping_pairs': mapping_pairs,
-    })
