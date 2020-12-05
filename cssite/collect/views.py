@@ -9,6 +9,8 @@ from django.conf import settings
 from .models import Account, Task, Participation, ParsedFile, SchemaAttribute, MappingInfo, MappingPair
 from .forms import LoginForm, GradeForm, SchemaChoiceForm, CreateTask, CreateMappingPair
 
+from string import ascii_lowercase
+from random import choice, randint, random
 from datetime import date, datetime, timedelta
 import os
 import pandas as pd
@@ -227,10 +229,10 @@ def syncTotalTableFile(task):
      - 관리자가 태스크 조회할 때
     """
     attr = [ attrObj.attr for attrObj in SchemaAttribute.objects.filter(task=task) ]
-    parsedfile_list = ParsedFile.objects.filter(task=task)
+    parsedfile_list = ParsedFile.objects.filter(task=task, pass_state=True)
 
     if not parsedfile_list:
-        return
+        return None, "Pass된 튜플 없음"
     
     # df = pd.DataFrame(columns=attr)
     # df = pd.read_csv(os.path.join(settings.JOINED_PATH_DATA_PARSED, parsedfile_list[0].__str__()))
@@ -252,9 +254,10 @@ def syncTotalTableFile(task):
     
     download_file_path = os.path.join(settings.JOINED_PATH_DATA_INTEGRATED, task.name) + ".csv"
     df = pd.concat(file_list, axis=0, ignore_index=True)
+    num_total_tuples = len(df)
     df.to_csv(download_file_path, header=attr, index=True)
 
-    return download_file_path
+    return download_file_path, num_total_tuples
 
 
 # 제출자: 제출한 파일 목록 확인 및 업로드
@@ -366,7 +369,10 @@ def parsedFileListAndUpload(request, pk):
 
         # save the parsed file
         # parsed_file_path = os.path.join(settings.DATA_PARSED, parsedFile.__str__()) 
-        parsed_file_path = os.path.join(settings.MEDIA_ROOT, parsedFile.file_original.name.replace('data_original/', 'data_parsed/'))
+        base_path = os.path.join(settings.MEDIA_ROOT, parsedFile.file_original.name.replace('data_original/', 'data_parsed/'))
+        parsed_file_path = os.path.splitext(base_path)[0] + '.csv'
+        while os.path.exists(parsed_file_path):
+            parsed_file_path = os.path.splitext(base_path)[0] + '_' + ''.join([choice(ascii_lowercase) for _ in range(randint(5, 8))]) + '.csv'
         df.to_csv(parsed_file_path, index=False)
 
         # increment submit count of Participation tuple by 1
@@ -387,6 +393,8 @@ def parsedFileListAndUpload(request, pk):
         # pass_state=False,
         # parsedFile.grading_end_date = datetime.now(),    # TODO: should be implemented
         parsedFile.file_parsed = parsed_file_path
+        parsedFile.file_parsed.name = os.path.basename(parsed_file_path)
+        print("parsed file path:", parsed_file_path)
         parsedFile.save()
 
         # TODO: data too long error
@@ -484,7 +492,8 @@ def download_parsedfile(request, pk):
             response['Content-Disposition'] = 'attachment;filename*=UTF-8\'\'%s' % file_base_name
             return response
 
-    return grade_parsedfile(request, pk)
+    # return grade_parsedfile(request, pk)
+    return HttpResponse("파싱 데이터 시퀀스 파일 다운로드 에러. 지속될 경우 관리자에게 문의해주세요.")
 
 
 
@@ -583,15 +592,14 @@ def showTask(request, task_id):
     applied = Participation.objects.filter(task=task, admission=False)
 
     # count the number of tuple
-    num_of_tuples = 0
-    table_file = syncTotalTableFile(task)
-    if table_file:
-        df_table_file = pd.read_csv(table_file)
-        num_of_tuples = len(df_table_file)
+    _, num_of_tuples = syncTotalTableFile(task)
+    # if table_file:
+    #     df_table_file = pd.read_csv(table_file)
+    #     num_of_tuples = len(df_table_file)
 
     return render(request, 'manager/task_select.html', {
         'task': task,
-        'task_info': str(list(Task.objects.filter(id=task_id).values())),
+        # 'task_info': str(list(Task.objects.filter(id=task_id).values())),
         'task_attributes': attributes,
         'task_derived_schemas': derived_schemas,
         'num_of_tuples': num_of_tuples,
@@ -606,18 +614,20 @@ def downloadAllFiles(request, task_id):
 
     task = get_object_or_404(Task, pk=task_id)
 
-    download_file_path = syncTotalTableFile(task)
+    download_file_path, _ = syncTotalTableFile(task)
 
     file_name = urllib.parse.quote((task.name+'.csv').encode('utf-8'))
     
+    if download_file_path is None:
+        return redirect('show task', task_id=task_id)
     if os.path.exists(download_file_path):
         with open(download_file_path, 'rb') as fh:
             response = HttpResponse(fh.read(), content_type='text/csv')
             # response = HttpResponse(fh.read(), content_type=mimetypes.guess_type(download_file_path)[0])
             response['Content-Disposition'] = 'attachment;filename*=UTF-8\'\'%s' % file_name
             return response
-
-    return showTask(request, task_id)
+    
+    return redirect('show task', task_id=task_id)
 
 
 
@@ -627,29 +637,31 @@ def parsedfile_list(request, task_id):
     parsedfiles = ParsedFile.objects.filter(task=task)
     context = {
         'parsedfiles': parsedfiles,
-        'count': len(parsedfiles)
+        'count': len(parsedfiles),
+        'task_id': task_id,
     }
     return render(request, 'manager/parsedfile_list.html', context)
 
 
 # 관리자: 평가자 목록
-def grader_list(request, file_id):
+def grader_list(request, task_id, file_id):
     graders = Account.objects.filter(role='평가자')
     context = {
         'graders': graders,
-        'file_id': file_id
+        'file_id': file_id,
+        'task_id': task_id,
     }
     return render(request, 'manager/grader_list.html', context)
 
 
 # 관리자: 평가자 배정
-def allocate_file(request, file_id, account_id):
+def allocate_file(request, task_id, file_id, account_id):
     file = get_object_or_404(ParsedFile, pk=file_id)
     account = get_object_or_404(Account, pk=account_id)
     file.grader = account
     file.grading_end_date = date.today() + timedelta(weeks=1)
     file.save()
-    return redirect('list tasks')
+    return redirect('parsedfile list', task_id=task_id)
 
 
 def createTask(request):

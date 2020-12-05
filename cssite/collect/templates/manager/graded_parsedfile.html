@@ -2,56 +2,37 @@
 {% block main_content %}
 
 <div class="commonContainerDiv">
-    <p class="commonTitleText">유저 평가 기록</p>
+  <p class="commonTitleText">유저 평가 기록</p>
 
-    <table class="commonTable">
-      <thead>
+  <table class="commonTable">
+    <thead>
+      <tr>
+        <th>태스크 명</th>
+        <th>파일 명</th>
+        <th>평가 날짜</th>
+        <th>평가 점수</th>
+        <th>평가하기</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for parsedfile in parsedfiles %}
         <tr>
-          <th>태스크 명</th>
-          <th>파일 명</th>
-          <th>평가 날짜</th>
-          <th>평가 점수</th>
-          <th>평가하기</th>
+          <td>{{ parsedfile.task.name }}</td>
+          <td>{{ parsedfile }}</td>
+          <td>{{ parsedfile.grade_date }}</td>
+          <td>{{ parsedfile.grading_score }}</td>
+          <td>
+            {% if parsedfile.pass_state %}
+                  Pass
+              {% else %}
+                  NonPass
+              {% endif %}
+          </td>
         </tr>
-      </thead>
-      <tbody>
-        {% for parsedfile in parsedfiles %}
-          <tr>
-            <td>{{ parsedfile.task.name }}</td>
-            <td>{{ parsedfile }}</td>
-            <td>{{ parsedfile.grade_date }}</td>
-            <td>{{ parsedfile.grading_score }}</td>
-            <td>
-              {% if parsedfile.pass_state %}
-                    Pass
-                {% else %}
-                    NonPass
-                {% endif %}
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-  
-    </table>
+      {% endfor %}
+    </tbody>
 
-
-
-
-  </div>
-<!--
-<h1>평가 기록</h1>
-<ul>
-{% for parsedfile in parsedfiles %}
-    <li>
-        {{ parsedfile.task.name }} {{ parsedfile }} {{ parsedfile.grade_date }} {{ parsedfile.grading_score }}
-        {% if parsedfile.pass_state %}
-            Pass
-        {% else %}
-            NonPass
-        {% endif %}
-    </li>
-{% endfor %}
-</ul>
--->
+  </table>
+</div>
 {% endblock main_content %}
         

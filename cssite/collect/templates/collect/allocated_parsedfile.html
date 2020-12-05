@@ -56,22 +56,6 @@
             </tbody>
           </table>
         </div>
-
-        <!--
-        <h1>할당된 파일 목록</h1>
-        <ul>
-        {% for parsedfile in parsedfiles %}
-            <li>
-                {{ parsedfile.task.name }} {{ parsedfile }}
-                {% if parsedfile.grading_end_date > now %}
-                    <a href="{% url 'collect:grade-parsedfile' parsedfile.id %}">평가하기</a>
-                {% else %}
-                    평가 기간 만료
-                {% endif %}
-            </li>
-        {% endfor %}
-        </ul>
-      -->
       </main>
 
       <footer class="mastfoot mt-auto">

@@ -9,19 +9,31 @@
   <table class="commonTable">
     <thead>
       <tr>
-        <th>파일 명</th>
+        <th>파일 이름</th>
+        <th>회차</th>
+        <th>기간</th>
+        <th>튜플 수</th>
+        <th>중복 튜플 수</th>
+        <th>Null 비율</th>
         <th>배정 상태</th>
+        <th>파싱된 파일</th>
       </tr>
     </thead>
     <tbody>
       {% for parsedfile in parsedfiles %}
         <tr>
-          <td>{{ parsedfile }} </td>
+          <td>{{ parsedfile }}</td>
+          <td>{{ parsedfile.submit_number }}</td>
+          <td>{{ parsedfile.start_date }} ~ {{ parsedfile.end_date }}</td>
+          <td>{{ parsedfile.total_tuple }}</td>
+          <td>{{ parsedfile.duplicated_tuple }}</td>
+          <td>{{ parsedfile.null_ratio }}</td>
           {% if parsedfile.grader %}
             <td>배정 완료</td>
           {% else %}
-            <td><a href="{% url 'grader list' parsedfile.id %}" style="color:rgb(48, 66, 146)">평가자 배정</a></td>
+            <td><a href="{% url 'grader list' task_id parsedfile.id %}" style="color:rgb(48, 66, 146)">평가자 배정</a></td>
           {% endif %}
+          <td><a href="/collect/allocated-parsedfiles/{{ parsedfile.id }}/download/">다운로드</a></td>
         </tr>
       {% endfor %}
     </tbody>
@@ -29,16 +41,5 @@
   </table>
 
 </div>
- <!--
-  <ul>
-  {% for parsedfile in parsedfiles %}
-    {% if parsedfile.grader %}
-      <li>{{ parsedfile }} 배정 완료</li>
-    {% else %}
-      <li>{{ parsedfile }} <a href="{% url 'grader list' parsedfile.id %}">평가자 배정</a></li>
-    {% endif %}
-  {% endfor %}
-  </ul>
--->
 
 {% endblock main_content %}
