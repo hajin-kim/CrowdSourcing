@@ -2,65 +2,95 @@
 {% block main_content %}
 
 <div id="taskParseMainDivSubmit" style="height:700px;">
-    <p class="taskListText">제출한 파일 목록</p>
-    <pre class="taskParseText">태스크 이름 : {{ task.name }}        저장된 Tuple 수 : {{ total_tuple }}</pre>
+  <p class="taskListText">제출한 파일 목록</p>
+  <pre class="taskParseText">태스크 이름 : {{ task.name }}    저장된 Tuple 수 : {{ total_tuple }}</pre>
 
-    <div id="taskParseDivSubmit">
-        <table class="taskListTable">
-            <thead>
-              <tr>
-                <th>파일 이름</th>
-                <th>회차</th>
-                <th>기간</th>
-                <th>평가 점수</th>
-                <th>PASS 상태</th>
-              </tr>
-            </thead>
-            <tbody>
-                
-            {% for parsedfile in parsedfile_list %}
-              <tr>
-                  <td>{{ parsedfile }}</td>
-                  <td>{{ parsedfile.submit_number }}</td>
-                  <td>{{ parsedfile.start_date }} ~ {{ parsedfile.end_date }}</td>
-                  <td>{{ parsedfile.grading_score }}</td>
-                  <td>{{ parsedfile.pass_state }}</td>
-              </tr>
-            {% endfor %}
-            </tbody>
+  <div id="taskParseDivSubmit">
+    <table class="taskListTable">
+      <thead>
+        <tr>
+        <th>파일 이름</th>
+        <th>회차</th>
+        <th>기간</th>
+        <th>튜플 수</th>
+        <th>중복 튜플 수</th>
+        <th>Null 비율</th>
+        <th>평가 점수</th>
+        <th>PASS 상태</th>
+        <th>파싱된 파일</th>
+        </tr>
+      </thead>
+      <tbody>
         
-          </table>
-    </div>
-    <div id="taskUploadDivSubmit" style="width:600px;height:300px;">
-        <p class="taskParseText">파일 업로드</p>
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ file_upload_form }}
-            <input class="taskUploadButton" type="submit" value="업로드" style="top:150px;">
-        </form>
-    </div>
+      {% for parsedfile in parsedfile_list %}
+        <tr>
+          <td>{{ parsedfile }}</td>
+          <td>{{ parsedfile.submit_number }}</td>
+          <td>{{ parsedfile.start_date }} ~ {{ parsedfile.end_date }}</td>
+          <td>{{ parsedfile.total_tuple }}</td>
+          <td>{{ parsedfile.duplicated_tuple }}</td>
+          <td>{{ parsedfile.null_ratio }}</td>
+          <td>{{ parsedfile.grading_score }}</td>
+          <td>{{ parsedfile.pass_state }}</td>
+          <td><a href="/collect/allocated-parsedfiles/{{ parsedfile.id }}/download/">다운로드</a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    
+      </table>
+  </div>
+  <div id="taskUploadDivSubmit" style="width:600px;height:300px;">
+    <p class="taskParseText">파일 업로드</p>
+    <form class="form-file-upload" action="{% url 'collect:submitted-parsedfiles' task.id %}" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% comment %}
+      'derived_schema', 
+      'file_original', 
+      'start_date', 
+      'end_date' 
+      {% endcomment %}
+      
+      <p class="fileUploadText" style="top:225px;">파일</p>
+      <input class="fileUploadInput" type="file" name="file_original" style="top:205px;" required>
+      {% comment %} tag: accept=.xls,.xlsx,.txt,.csv,.html,.json {% endcomment %}
+
+      <p class="fileUploadText" style="top:225px;">스키마</p>
+      <select class="fileUploadInput" name="derived_schema" style="top:280px;" required>
+        {% for schema in schemas %}
+          <option value="{{ schema.derived_schema_name }}">{{ schema.derived_schema_name }}</option>
+        {% endfor %}
+      </select>
+
+      <p class="fileUploadText" style="top:225px;">데이터 수집 기간</p>
+      <input class="fileUploadInput" type="date" name="start_date" style="top:205px;" required>
+      <p class="fileUploadText" style="top:225px;">~</p>
+      <input class="fileUploadInput" type="date" name="end_date" style="top:205px;" required>
+
+      <button class="fileUploadButton" type="submit" style="top:150px;">파일 업로드</button>
+    </form>
+  </div>
 
 </div>
 
 {% endblock main_content %}
 <!--
 
-    태스크 이름: {{ task.name }}<br>
-    저장된 tuple 수: {{ total_tuple }}
-    <p>파일 이름-회차-기간-평가 점수-패스 여부</p>
-    <ul>
-    {% for parsedfile in parsedfile_list %}
-        <li>
-        {{ parsedfile }} {{ parsedfile.submit_number }} {{ parsedfile.start_date }}~{{ parsedfile.end_date }}
-        {{ parsedfile.grading_score }} {{ parsedfile.pass_state }}
-        </li>
-    {% endfor %}
-    </ul>
-    <h2>Upload file</h2>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ file_upload_form }}
-        <button type="submit">upload</button>
-    </form>
+  태스크 이름: {{ task.name }}<br>
+  저장된 tuple 수: {{ total_tuple }}
+  <p>파일 이름-회차-기간-평가 점수-패스 여부</p>
+  <ul>
+  {% for parsedfile in parsedfile_list %}
+    <li>
+    {{ parsedfile }} {{ parsedfile.submit_number }} {{ parsedfile.start_date }}~{{ parsedfile.end_date }}
+    {{ parsedfile.grading_score }} {{ parsedfile.pass_state }}
+    </li>
+  {% endfor %}
+  </ul>
+  <h2>Upload file</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ file_upload_form }}
+    <button type="submit">upload</button>
+  </form>
 
 -->
