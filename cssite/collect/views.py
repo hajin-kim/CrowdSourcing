@@ -47,6 +47,9 @@ def fileList(request):
 def signup(request):
     context = {}
     if request.method == "POST":
+        if User.objects.filter(username=request.POST["username"]):
+            context.update({'error': "이미 존재하는 ID입니다."})
+            return render(request, 'collect/signup.html', context)
         if request.POST["password1"] == request.POST["password2"]:
             user = User.objects.create_user(
                 username=request.POST["username"],
@@ -355,17 +358,22 @@ def parsedFileListAndUpload(request, pk):
         for key in df.columns:
             if str(key) in mapping_from_to.keys():
                 df.rename(columns={key: mapping_from_to[str(key)]}, inplace=True)
+                print("#", "key", key, "changed to", mapping_from_to[str(key)])
             else:
                 df.drop([key], axis='columns', inplace=True)
+                df.drop([str(key)], axis='columns', inplace=True)
+                print("#", "key", key, "a.k.a.", str(key), "is dropped")
         
         i = 0
         for key in mapping_from_to.values():
-            if not key in df.columns:
+            if str(key) not in df.columns:
                 df.insert(loc=i, column=key, value=None, allow_duplicates=False)
+                print("#", "key", key, "is inserted")
             # df.insert(loc=i, column=key, value=None)
             i += 1
 
         df = df[mapping_from_to.values()]
+        print(df)
 
         # save the parsed file
         # parsed_file_path = os.path.join(settings.DATA_PARSED, parsedFile.__str__()) 
