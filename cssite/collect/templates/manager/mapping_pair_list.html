@@ -3,26 +3,36 @@
 {% block main_content %}
 
 <div class="commonContainerDiv" style="text-align:center;">
-<p class="commonTitleText">{{ task_name }} 의 파생 스키마 {{ schema_name }} 의 매핑 정보</p>
-<p class="commonTitleText" style="font-size:16px;">{{ list_of_mapping_pairs|linebreaks }}</p>
-
-<div>
-  <a href="./create">
-      매핑 정보 추가 생성
-  </a>
-</div>
+  <p class="commonTitleText">{{ task_name }}의 파생 스키마 {{ schema_name }}의 매핑 정보</p>
+  <p class="commonTitleText" style="font-size:16px;">{{ list_of_mapping_pairs|linebreaks }}</p>
 
 
-</div>
-<!--
-  <h2>매핑 정보 of "{{ schema_name }}" @"{{ task_name }}"</h2>
-  {{ list_of_mapping_pairs|linebreaks }}
+  <p class="commonTitleText">매핑 정보 생성하기</p>
+  <div style="text-align:center;">
+    <form class="form-create-mapping-pair" action="{% url 'create mapping pair' task_id schema_id %}" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% comment %}
+        'schema_attribute',
+        'parsing_column_name',
+      {% endcomment %}
 
-  <div>
-      <a href="./create">
-          매핑 정보 생성
-      </a>
+      <p class="createMappingPairText" style="top:225px;">원본 스키마의 컬럼</p>
+      <select class="createMappingPairInput" name="attr" style="top:280px;" required>
+        {% for schema_attribute in schema_attribute_list %}
+          <option value="{{ schema_attribute.attr }}">{{ schema_attribute.attr }}</option>
+        {% endfor %}
+      </select>
+
+      <p class="createMappingPairText" style="top:225px;">파생 스키마의 컬럼 이름</p>
+      <input class="createMappingPairInput" type="text" name="parsing_column_name" style="top:130px;" required>
+      {% comment %} tag: placeholder="ID를 입력하세요" {% endcomment %}
+
+      <button type="submit">생성</button>
+    </form>
   </div>
--->
+
+
+</div>
+
 {% endblock main_content %}
 

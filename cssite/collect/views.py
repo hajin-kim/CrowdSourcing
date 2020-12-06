@@ -7,8 +7,10 @@ from django.contrib.auth.models import User
 from django.conf import settings
 
 from .models import Account, Task, Participation, ParsedFile, SchemaAttribute, MappingInfo, MappingPair
-from .forms import LoginForm, GradeForm, SchemaChoiceForm, UploadForm, CreateTask, CreateSchemaAttribute, CreateMappingInfo, CreateMappingPair
+from .forms import LoginForm, GradeForm, CreateTask
 
+from string import ascii_lowercase
+from random import choice, randint, random
 from datetime import date, datetime, timedelta
 import os
 import pandas as pd
@@ -45,6 +47,9 @@ def fileList(request):
 def signup(request):
     context = {}
     if request.method == "POST":
+        if User.objects.filter(username=request.POST["username"]):
+            context.update({'error': "이미 존재하는 ID입니다."})
+            return render(request, 'collect/signup.html', context)
         if request.POST["password1"] == request.POST["password2"]:
             user = User.objects.create_user(
                 username=request.POST["username"],
@@ -227,10 +232,10 @@ def syncTotalTableFile(task):
      - 관리자가 태스크 조회할 때
     """
     attr = [ attrObj.attr for attrObj in SchemaAttribute.objects.filter(task=task) ]
-    parsedfile_list = ParsedFile.objects.filter(task=task)
+    parsedfile_list = ParsedFile.objects.filter(task=task, pass_state=True)
 
     if not parsedfile_list:
-        return
+        return None, "Pass된 튜플 없음"
     
     # df = pd.DataFrame(columns=attr)
     # df = pd.read_csv(os.path.join(settings.JOINED_PATH_DATA_PARSED, parsedfile_list[0].__str__()))
@@ -252,9 +257,10 @@ def syncTotalTableFile(task):
     
     download_file_path = os.path.join(settings.JOINED_PATH_DATA_INTEGRATED, task.name) + ".csv"
     df = pd.concat(file_list, axis=0, ignore_index=True)
+    num_total_tuples = len(df)
     df.to_csv(download_file_path, header=attr, index=True)
 
-    return download_file_path
+    return download_file_path, num_total_tuples
 
 
 # 제출자: 제출한 파일 목록 확인 및 업로드
@@ -264,144 +270,148 @@ def parsedFileListAndUpload(request, pk):
 
     user = request.user
     task = get_object_or_404(Task, pk=pk)
+    schemas = MappingInfo.objects.filter(task=task)
 
-    form = None
     if request.method == 'POST':
-        form = UploadForm(request.POST, request.FILES)
-        if form.is_valid():            
-            submitter = Account.objects.filter(user=user)[0]
-            # grader_pk = 2
-            # grader = Account.objects.filter(id=grader_pk)[0]
-            grader = None
-                
-            # check if the user is participating in the task
-            participation = Participation.objects.filter(
-                account=submitter, task=task)
-            if len(participation.values_list()) == 0:
-                return HttpResponse("참여중인 태스크가 아닙니다!")
-            participation = participation[0]
+        submitter = Account.objects.filter(user=user)[0]
+        # grader_pk = 2
+        # grader = Account.objects.filter(id=grader_pk)[0]
+        grader = Account.objects.filter(role="평가자")[:]
+        grader = None
             
-            # form = form.save(commit=False) # 중복 DB save를 방지
-            parsedFile = form.save()
-            parsedFile.task = task
-            parsedFile.submitter = submitter
-            parsedFile.grader = grader
-            parsedFile.save()
+        # check if the user is participating in the task
+        participation = Participation.objects.filter(
+            account=submitter, task=task)
+        if len(participation.values_list()) == 0:
+            return HttpResponse("참여중인 태스크가 아닙니다!")
+        participation = participation[0]
 
-            derived_schema = parsedFile.derived_schema
-            original_file_path = os.path.join(settings.MEDIA_ROOT, 
-                parsedFile.file_original.name)
-            
-            # get DB table mapping infos
-            mapping_info = MappingInfo.objects.filter(
-                task=task,
-                derived_schema_name=derived_schema
-            )[0]
-            # get parsing information into a dictionary
-            # { 파싱전: 파싱후 }
-            mapping_from_to = {
-                i.parsing_column_name: i.schema_attribute.attr
-                for i in MappingPair.objects.filter(
-                    mapping_info=mapping_info
-                )
-            }
+        mapping_info = MappingInfo.objects.get(task=task, derived_schema_name=request.POST['derived_schema'])
+        
+        parsedFile = ParsedFile(
+            task=task,
+            submitter=submitter,
+            grader=grader,
+            derived_schema=mapping_info,
+            start_date=request.POST['start_date'],
+            end_date=request.POST['end_date'],
+        )
+        parsedFile.file_original = request.FILES['file_original']
+        parsedFile.save()
+        
+        original_file_path = os.path.join(settings.MEDIA_ROOT, 
+            parsedFile.file_original.name)
+        
+        # get parsing information into a dictionary
+        # { 파싱전: 파싱후 }
+        mapping_from_to = {
+            i.parsing_column_name: i.schema_attribute.attr
+            for i in MappingPair.objects.filter(
+                mapping_info=mapping_info
+            )
+        }
 
-            # attr = [ attrObj.attr for attrObj in SchemaAttribute.objects.filter(task=task) ]
-            # attr = list(mapping_from_to.keys())
+        # attr = [ attrObj.attr for attrObj in SchemaAttribute.objects.filter(task=task) ]
+        # attr = list(mapping_from_to.keys())
 
-            # guess type and load file into pd.DataFrame
-            # types: https://www.iana.org/assignments/media-types/media-types.xhtml
-            original_file_type = mimetypes.guess_type(original_file_path)
-            print(original_file_type)
+        # guess type and load file into pd.DataFrame
+        # types: https://www.iana.org/assignments/media-types/media-types.xhtml
+        original_file_type = mimetypes.guess_type(original_file_path)
+        print(original_file_type)
 
-            df = None
-            # names=['ID', 'A', 'B', 'C', 'D'], header=None
-            # header=0
-            # encoding='CP949'
-            # encoding='latin'
-            if original_file_type[0] in (
-                    'text/csv',
-                    'text/plain'
-                ):
-                # load csv file from the server-stored file
-                # assume that header exists
-                df = pd.read_csv(original_file_path, header=0, na_values=('', '\n'), keep_default_na=True)
-            elif original_file_type[0] in (
-                    'application/vnd.ms-excel', # official
-                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', # xlsx
-                    'application/msexcel',
-                    'application/x-msexcel',
-                    'application/x-ms-excel',
-                    'application/x-excel',
-                    'application/x-dos_ms_excel',
-                    'application/xls',
-                    'application/x-xls',
-                ):
-                df = pd.read_excel(original_file_path, header=0, na_values=('', ), keep_default_na=True)
-            elif original_file_type[0] == 'application/json':
-                df = pd.read_json(original_file_path)
-            elif original_file_type[0] == 'text/html':
-                df = pd.read_html(original_file_path, na_values=('', ), keep_default_na=True)
-            
-            if df is None:
-                return HttpResponse("제출 error (file empty 등)")
+        df = None
+        # names=['ID', 'A', 'B', 'C', 'D'], header=None
+        # header=0
+        # encoding='CP949'
+        # encoding='latin'
+        if original_file_type[0] in (
+                'text/csv',
+                'text/plain'
+            ):
+            # load csv file from the server-stored file
+            # assume that header exists
+            df = pd.read_csv(original_file_path, header=0, na_values=('', '\n'), keep_default_na=True)
+        elif original_file_type[0] in (
+                'application/vnd.ms-excel', # official
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', # xlsx
+                'application/msexcel',
+                'application/x-msexcel',
+                'application/x-ms-excel',
+                'application/x-excel',
+                'application/x-dos_ms_excel',
+                'application/xls',
+                'application/x-xls',
+            ):
+            df = pd.read_excel(original_file_path, header=0, na_values=('', ), keep_default_na=True)
+        elif original_file_type[0] == 'application/json':
+            df = pd.read_json(original_file_path)
+        elif original_file_type[0] == 'text/html':
+            df = pd.read_html(original_file_path, na_values=('', ), keep_default_na=True)
+        
+        if df is None:
+            return HttpResponse("제출 error (file empty 등)")
 
-            # parse
-            print(df.columns)
-            print('keys:', mapping_from_to.keys())
-            print('values:', mapping_from_to.values())
-            for key in df.columns:
-                if key in mapping_from_to.keys():
-                    df.rename(columns={key: mapping_from_to[key]}, inplace=True)
-                else:
-                    df.drop([key], axis='columns', inplace=True)
-            
-            i = 0
-            for key in mapping_from_to.values():
-                if not key in df.columns:
-                    df.insert(loc=i, column=key, value=None, allow_duplicates=False)
-                # df.insert(loc=i, column=key, value=None)
-                i += 1
+        # parse
+        print(df.columns)
+        print('keys:', mapping_from_to.keys())
+        print('values:', mapping_from_to.values())
+        for key in df.columns:
+            if str(key) in mapping_from_to.keys():
+                df.rename(columns={key: mapping_from_to[str(key)]}, inplace=True)
+                print("#", "key", key, "changed to", mapping_from_to[str(key)])
+            else:
+                df.drop([key], axis='columns', inplace=True)
+                df.drop([str(key)], axis='columns', inplace=True)
+                print("#", "key", key, "a.k.a.", str(key), "is dropped")
+        
+        i = 0
+        for key in mapping_from_to.values():
+            if str(key) not in df.columns:
+                df.insert(loc=i, column=key, value=None, allow_duplicates=False)
+                print("#", "key", key, "is inserted")
+            # df.insert(loc=i, column=key, value=None)
+            i += 1
 
-            df = df[mapping_from_to.values()]
+        df = df[mapping_from_to.values()]
+        print(df)
 
-            # save the parsed file
-            # parsed_file_path = os.path.join(settings.DATA_PARSED, parsedFile.__str__()) 
-            parsed_file_path = os.path.join(settings.MEDIA_ROOT, parsedFile.file_original.name.replace('data_original/', 'data_parsed/'))
-            df.to_csv(parsed_file_path, index=False)
+        # save the parsed file
+        # parsed_file_path = os.path.join(settings.DATA_PARSED, parsedFile.__str__()) 
+        base_path = os.path.join(settings.MEDIA_ROOT, parsedFile.file_original.name.replace('data_original/', 'data_parsed/'))
+        parsed_file_path = os.path.splitext(base_path)[0] + '.csv'
+        while os.path.exists(parsed_file_path):
+            parsed_file_path = os.path.splitext(base_path)[0] + '_' + ''.join([choice(ascii_lowercase) for _ in range(randint(5, 8))]) + '.csv'
+        df.to_csv(parsed_file_path, index=False)
 
-            # increment submit count of Participation tuple by 1
-            participation.submit_count += 1
-            participation.save()
+        # increment submit count of Participation tuple by 1
+        participation.submit_count += 1
+        participation.save()
 
-            # make statistic
-            duplicated_tuple = len(df)-len(df.drop_duplicates())
-            null_ratio = df.isnull().sum().sum()/(len(df)*len(df.columns)) if (len(df)*len(df.columns)) > 0 else 1
-            print("###", null_ratio)
-            
-            # save the parsed file
-            parsedFile.submit_number = participation.submit_count
-            parsedFile.total_tuple = len(df)
-            parsedFile.duplicated_tuple = duplicated_tuple
-            parsedFile.null_ratio = null_ratio
-            # grading_score=,   # TODO: should be immplemented
-            # pass_state=False,
-            # parsedFile.grading_end_date = datetime.now(),    # TODO: should be implemented
-            parsedFile.file_parsed = parsed_file_path
-            parsedFile.save()
+        # make statistic
+        duplicated_tuple = len(df)-len(df.drop_duplicates())
+        null_ratio = df.isnull().sum().sum()/(len(df)*len(df.columns)) if (len(df)*len(df.columns)) > 0 else 1
+        print("###", null_ratio)
+        
+        # save the parsed file
+        parsedFile.submit_number = participation.submit_count
+        parsedFile.total_tuple = len(df)
+        parsedFile.duplicated_tuple = duplicated_tuple
+        parsedFile.null_ratio = null_ratio
+        # grading_score=,   # TODO: should be immplemented
+        # pass_state=False,
+        # parsedFile.grading_end_date = datetime.now(),    # TODO: should be implemented
+        parsedFile.file_parsed = parsed_file_path
+        parsedFile.file_parsed.name = os.path.basename(parsed_file_path)
+        print("parsed file path:", parsed_file_path)
+        parsedFile.save()
 
-            # TODO: data too long error
-            # select @@global.sql_mode;  # SQL 설정 보기
-            # TODO: remove "STRICT_TRANS_TABLES" by set command without this attribute
-            # set @@global.sql_mode="ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION";
-            
-            # TODO: Return 부분 수정해야함
-            form = UploadForm()
-        # elif schema_choice_form.is_valid():
-
-    else:
-        form = UploadForm()
-        # schema_choice_form = SchemaChoiceForm()
+        # TODO: data too long error
+        # select @@global.sql_mode;  # SQL 설정 보기
+        # TODO: remove "STRICT_TRANS_TABLES" by set command without this attribute
+        # set @@global.sql_mode="ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION";
+        
+        return redirect(reverse('collect:submitted-parsedfiles', kwargs={'pk': pk}))
+    
     
     parsedfile_list = user.account.parsed_submits.filter(task=task)
     total_tuple = sum(
@@ -410,9 +420,10 @@ def parsedFileListAndUpload(request, pk):
 
     context = {
         'task': task,
+        'schemas': schemas,
         'parsedfile_list': parsedfile_list,
         'total_tuple': total_tuple,
-        'file_upload_form': form,
+        # 'file_upload_form': form,
     }
     # return redirect(reverse('collect:submitted-parsedfiles', kwargs=context))
 
@@ -489,7 +500,8 @@ def download_parsedfile(request, pk):
             response['Content-Disposition'] = 'attachment;filename*=UTF-8\'\'%s' % file_base_name
             return response
 
-    return grade_parsedfile(request, pk)
+    # return grade_parsedfile(request, pk)
+    return HttpResponse("파싱 데이터 시퀀스 파일 다운로드 에러. 지속될 경우 관리자에게 문의해주세요.")
 
 
 
@@ -588,15 +600,14 @@ def showTask(request, task_id):
     applied = Participation.objects.filter(task=task, admission=False)
 
     # count the number of tuple
-    num_of_tuples = 0
-    table_file = syncTotalTableFile(task)
-    if table_file:
-        df_table_file = pd.read_csv(table_file)
-        num_of_tuples = len(df_table_file)
+    _, num_of_tuples = syncTotalTableFile(task)
+    # if table_file:
+    #     df_table_file = pd.read_csv(table_file)
+    #     num_of_tuples = len(df_table_file)
 
     return render(request, 'manager/task_select.html', {
         'task': task,
-        'task_info': str(list(Task.objects.filter(id=task_id).values())),
+        # 'task_info': str(list(Task.objects.filter(id=task_id).values())),
         'task_attributes': attributes,
         'task_derived_schemas': derived_schemas,
         'num_of_tuples': num_of_tuples,
@@ -611,18 +622,20 @@ def downloadAllFiles(request, task_id):
 
     task = get_object_or_404(Task, pk=task_id)
 
-    download_file_path = syncTotalTableFile(task)
+    download_file_path, _ = syncTotalTableFile(task)
 
     file_name = urllib.parse.quote((task.name+'.csv').encode('utf-8'))
     
+    if download_file_path is None:
+        return redirect('show task', task_id=task_id)
     if os.path.exists(download_file_path):
         with open(download_file_path, 'rb') as fh:
             response = HttpResponse(fh.read(), content_type='text/csv')
             # response = HttpResponse(fh.read(), content_type=mimetypes.guess_type(download_file_path)[0])
             response['Content-Disposition'] = 'attachment;filename*=UTF-8\'\'%s' % file_name
             return response
-
-    return showTask(request, task_id)
+    
+    return redirect('show task', task_id=task_id)
 
 
 
@@ -632,29 +645,31 @@ def parsedfile_list(request, task_id):
     parsedfiles = ParsedFile.objects.filter(task=task)
     context = {
         'parsedfiles': parsedfiles,
-        'count': len(parsedfiles)
+        'count': len(parsedfiles),
+        'task_id': task_id,
     }
     return render(request, 'manager/parsedfile_list.html', context)
 
 
 # 관리자: 평가자 목록
-def grader_list(request, file_id):
+def grader_list(request, task_id, file_id):
     graders = Account.objects.filter(role='평가자')
     context = {
         'graders': graders,
-        'file_id': file_id
+        'file_id': file_id,
+        'task_id': task_id,
     }
     return render(request, 'manager/grader_list.html', context)
 
 
 # 관리자: 평가자 배정
-def allocate_file(request, file_id, account_id):
+def allocate_file(request, task_id, file_id, account_id):
     file = get_object_or_404(ParsedFile, pk=file_id)
     account = get_object_or_404(Account, pk=account_id)
     file.grader = account
     file.grading_end_date = date.today() + timedelta(weeks=1)
     file.save()
-    return redirect('list tasks')
+    return redirect('parsedfile list', task_id=task_id)
 
 
 def createTask(request):
@@ -698,16 +713,15 @@ def createTask(request):
 """
 view functions for attribute
 """
-
-
 def listAttributes(request, task_id):
     """
     docstring
     """
-    task = Task.objects.filter(id=task_id)[0]
+    task = Task.objects.get(id=task_id)
     attributes = generateListString(SchemaAttribute.objects.filter(task=task))
     return render(request, 'manager/attribute_list.html', {
         'task_name': task.name,
+        'task_id': task_id,
         'list_of_attributes': attributes,
     })
 
@@ -716,46 +730,30 @@ def createAttribute(request, task_id):
     """
     docstring
     """
-    form = None
-    task = Task.objects.filter(id=task_id)[0]
-    attribute = None
-
+    task = Task.objects.get(id=task_id)
     
     # if task.activation_state:
     #     return HttpResponse("<h2>태스크가 활성화되어 있습니다!</h3>")
-    
-    attributes = generateListString(SchemaAttribute.objects.filter(task=task))
 
     if request.method == 'POST':
-        form = CreateSchemaAttribute(request.POST, request.FILES)
-        if form.is_valid():
-            # form = form.save(commit=False) # 중복 DB save를 방지
-            attribute = form.save(task)
-            # attribute.task = task
-            attribute.save()
+        # form = form.save(commit=False) # 중복 DB save를 방지
+        attribute = SchemaAttribute(
+            task=task,
+            attr=request.POST['attr']
+        )
+        # attribute.task = task
+        attribute.save()
 
-            return redirect('create attribute', task_id=task_id)
-
-    else:
-        form = CreateSchemaAttribute()
-
-    return render(request, 'manager/attribute_create.html', {
-        'create_attribute_form': form,
-        'list_of_attributes': attributes,
-    })
-
+    return redirect('list attributes', task_id=task_id)
 
 """
 view functions for derived schema
 """
-
-
 def listDerivedSchemas(request, task_id):
     """
     docstring
     """
-    task = Task.objects.filter(id=task_id)[0]
-
+    task = Task.objects.get(id=task_id)
     derived_schemas = MappingInfo.objects.filter(task=task)
     return render(request, 'manager/derived_schema_list.html', {
         'task_id': task_id,
@@ -768,8 +766,8 @@ def showDerivedSchema(request, task_id, schema_id):
     """
     docstring
     """
-    task = Task.objects.filter(id=task_id)[0]
-    schema = MappingInfo.objects.filter(id=schema_id, task=task)[0]
+    task = Task.objects.get(id=task_id)
+    schema = MappingInfo.objects.get(id=schema_id, task=task)
 
     schema_info = MappingInfo.objects.filter(id=schema_id).values()[0]
     mapping_pairs = generateListString(
@@ -781,30 +779,20 @@ def showDerivedSchema(request, task_id, schema_id):
         'mapping_pairs': mapping_pairs,
     })
 
-
 def createDerivedSchema(request, task_id):
     """
     docstring
     """
-    form = None
     task = Task.objects.filter(id=task_id)[0]
     schema = None
     if request.method == 'POST':
-        form = CreateMappingInfo(request.POST, request.FILES)
-        if form.is_valid():
-            # form = form.save(commit=False) # 중복 DB save를 방지
-            schema = form.save(task)
-            # schema.task = task
-            schema.save()
+        schema = MappingInfo(
+            task=task,
+            derived_schema_name=request.POST['derived_schema_name']
+        )
+        schema.save()
 
-            return redirect('list derived schemas', task_id=task_id)
-
-    else:
-        form = CreateMappingInfo()
-
-    return render(request, 'manager/derived_schema_create.html', {
-        'create_derived_schema_form': form
-    })
+    return redirect('list derived schemas', task_id=task_id)
 
 
 """
@@ -816,14 +804,19 @@ def listMappingPairs(request, task_id, schema_id):
     """
     docstring
     """
-    task = Task.objects.filter(id=task_id)[0]
-    derived_schema = MappingInfo.objects.filter(id=schema_id, task=task)[0]
+    task = Task.objects.get(id=task_id)
+    derived_schema = MappingInfo.objects.get(id=schema_id, task=task)
 
     mapping_pairs = generateListString(
         MappingPair.objects.filter(mapping_info=derived_schema))
+    schema_attribute_list = SchemaAttribute.objects.filter(task=task)
+
     return render(request, 'manager/mapping_pair_list.html', {
+        'task_id': task_id,
         'task_name': task.name,
+        'schema_id': schema_id,
         'schema_name': derived_schema.derived_schema_name,
+        'schema_attribute_list': schema_attribute_list,
         'list_of_mapping_pairs': mapping_pairs,
     })
 
@@ -832,28 +825,16 @@ def createMappingPair(request, task_id, schema_id):
     """
     docstring
     """
-    form = None
-    task = Task.objects.filter(id=task_id)[0]
-    derived_schema = MappingInfo.objects.filter(id=schema_id, task=task)[0]
+    task = Task.objects.get(id=task_id)
+    derived_schema = MappingInfo.objects.get(id=schema_id, task=task)
 
-    mapping_pairs = generateListString(
-        MappingPair.objects.filter(mapping_info=derived_schema))
-
-    mapping_pair = None
     if request.method == 'POST':
-        form = CreateMappingPair(request.POST, request.FILES)
-        if form.is_valid():
-            # form = form.save(commit=False) # 중복 DB save를 방지
-            mapping_pair = form.save(derived_schema)
-            # schema.task = task
-            mapping_pair.save()
+        mapping_pair = MappingPair(
+            mapping_info=derived_schema,
+            schema_attribute=SchemaAttribute.objects.get(task=task, attr=request.POST['attr']),
+            parsing_column_name=request.POST['parsing_column_name'],
+        )
+        mapping_pair.save()
 
-            return redirect('create mapping pair', task_id=task_id, schema_id=schema_id)
+    return redirect('list mapping pairs', task_id=task_id, schema_id = schema_id)
 
-    else:
-        form = CreateMappingPair()
-
-    return render(request, 'manager/mapping_pair_create.html', {
-        'create_mapping_pair_form': form,
-        'list_of_mapping_pairs': mapping_pairs,
-    })

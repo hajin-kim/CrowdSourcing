@@ -1,34 +1,34 @@
 {% extends 'collect/submitter.html' %}
 {% block main_content %}
-<div id="taskListDiv">
+  <div id="taskListDiv">
     <p class="taskListText">태스크 목록</p>
 
     <table class="taskListTable">
-        <thead>
-            <tr>
-                <th>태스크 이름</th>
-                <th>신청 상태</th>
-            </tr>
-        </thead>
+      <thead>
+        <tr>
+          <th>태스크 이름</th>
+          <th>신청 상태</th>
+        </tr>
+      </thead>
 
-        <tbody>
+      <tbody>
         {% for task in task_list %}
-            {% if task.activation_state %}
+          {% if task.activation_state %}
             <tr>
-                <td><a href="{% url 'collect:task-detail' task.id %}" style="color:rgb(48, 66, 146)" > {{ task.name }}</a></td>
-                <td>
-                    {% if task not in participate_tasks %}
-                        <a href="{% url 'collect:create-participation' task.id %}" style="color:rgb(48, 66, 146)" ><button>참여 신청</button></a>
-                    {% else %}
-                        신청 완료
-                    {% endif %}
-                </td>
+              <td><a href="{% url 'collect:task-detail' task.id %}" style="color:rgb(48, 66, 146)" > {{ task.name }}</a></td>
+              <td>
+                {% if task not in participate_tasks %}
+                  <a href="{% url 'collect:create-participation' task.id %}" style="color:rgb(48, 66, 146)" ><button>참여 신청</button></a>
+                {% else %}
+                  신청 완료
+                {% endif %}
+              </td>
             </tr>
-            {% endif %}
+          {% endif %}
         {% endfor %}
-        </tbody>
+      </tbody>
     </table>
-</div>
+  </div>
 
 {% endblock main_content %}
 

@@ -24,7 +24,6 @@
         <h3 class="masthead-brand">데이터베이스</h3>
         <nav class="nav nav-masthead justify-content-center">
             <a class="nav-link active" href="{% url 'collect:manager' %}">Home</a>
-            <a class="nav-link active" href="{% url 'collect:logout' %}">로그아웃</a>
             {% comment %}
             TODO:
             url에 문제가 있어서, 관리자는 자기 정보 수정할 수 없도록 했습니다.
@@ -35,6 +34,8 @@
             <a class="nav-link active" href="{% url 'collect:users' %}">유저 정보 조회</a>
             <a class="nav-link active" href="{% url 'list tasks' %}">태스크 목록</a>
             <a class="nav-link active" href="{% url 'create task' %}">태스크 생성하기</a>
+
+            <a class="nav-link active" href="{% url 'collect:logout' %}">로그아웃</a>
         </nav>
       </div>
     </header>

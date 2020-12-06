@@ -3,45 +3,53 @@
 {% block main_content %}
 
 <div class="commonContainerDiv" style="text-align:center;">
-  <p class="commonTitleText">{{ task_name }} 의 파생 스키마 목록</p>
-  <div style="height:50px;font-size:20px;"><a href="./create">파생 스키마 추가 생성</a></div>
-  <table class="commonTable">
-    <thead>
-      <tr>
-        <th>스키마 이름</th>
-        <th>상세 조회</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for schema in list_of_derived_schemas %}
-      <tr>
-        <td>{{schema.derived_schema_name}}</td>
-        <td><a href = "{% url 'show derived schema' task_id schema.id %}"><button>상세 조회</button></a></td>
-      </tr>
-      {% endfor %}
-    </tbody>
-
-  </table>
-
   
+  <p class="commonTitleText">파생 스키마 생성하기</p>
+  <div style="text-align:center;">
+    <form class="form-create-schema" action="{% url 'create derived schema' task_id %}" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% comment %} 
+        'derived_schema_name'
+      {% endcomment %}
+
+      <p class="createSchemaText" style="top:225px;">스키마 이름</p>
+      <input class="createSchemaInput" type="text" name="derived_schema_name" style="top:130px;" required>
+      {% comment %} tag: placeholder="ID를 입력하세요" {% endcomment %}
+
+      <button type="submit">생성</button>
+    </form>
+    {% comment %} 
+    <p class="commonTitleText" style="font-size:20px;">현재 속성 목록</p>
+    {{ list_of_attributes|linebreaks }}
+    {% endcomment %}
+  </div>
+
+  <br><br>
+  
+  <p class="commonTitleText" style="font-size:20px;">{{ task_name }}의 파생 스키마 목록</p>
+  {% comment %} <div style="height:50px;font-size:20px;"><a href="./create">파생 스키마 추가 생성</a></div> {% endcomment %}
+  <div style="text-align:center;">
+    <table class="commonTable" style="top:250px;">
+      <thead>
+        <tr>
+          <th>스키마 이름</th>
+          <th>상세 조회</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for schema in list_of_derived_schemas %}
+          <tr>
+            <td>{{schema.derived_schema_name}}</td>
+            <td><a href = "{% url 'show derived schema' task_id schema.id %}"><button>상세 조회</button></a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
 
 </div>
 
-<!--
-  <h2>파생 스키마 목록 of "{{ task_name }}"</h2>
-  {% for schema in list_of_derived_schemas %}
-  <h4>{{schema.derived_schema_name}}</h4>
-  <a href = "{% url 'show derived schema' task_id schema.id %}"><button>상세 조회</button></a><br>
-  <hr>
-
-  {% endfor %}
-
-  <div>
-      <a href="./create">
-          파생 스키마 생성
-      </a>
-  </div>
--->
 {% endblock main_content %}
 
 

@@ -3,69 +3,73 @@
 
 {% block main_content %}
 <div id="mainDiv">
-    <div id="taskDiv1">
+  <div id="taskDiv1">
 
-        <p class="taskInfoText">참여 신청 중인 태스크 목록</p>
+    <p class="taskInfoText">참여 신청 중인 태스크 목록</p>
 
-        <table class="taskInfoTable">
-            <thead>
-                <tr>
-                    <th>태스크 이름</th>
-                    <th>참여 상태</th>
-                    <th>참여 관리</th>
-                </tr>
-            </thead>
-            <tbody>
-              {% for participate in participations %}
-                {% if not participate.admission %}
-                <td> <a href="{% url 'collect:task-detail' participate.task.id %}" style="color:rgb(48, 66, 146)">{{ participate.task.name }}</a></td>
-                <td>참여 신청 중</td>
-                <td>
-                    {% if request.user.is_superuser %}
-                        <a href="{% url 'collect:delete-participation' participate.id %}">승인</a>
-                    {% else %}
-                        <a href="{% url 'collect:delete-participation' participate.id %}" style="color:rgb(48, 66, 146)">취소</a>
-                    {% endif %}
-                </td>
+    <table class="taskInfoTable">
+      <thead>
+        <tr>
+          <th>태스크 이름</th>
+          <th>참여 상태</th>
+          <th>참여 관리</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for participate in participations %}
+          {% if not participate.admission %}
+            <tr>
+              <td> <a href="{% url 'collect:task-detail' participate.task.id %}" style="color:rgb(48, 66, 146)">{{ participate.task.name }}</a></td>
+              <td>참여 신청 중</td>
+              <td>
+                {% if request.user.is_superuser %}
+                  <a href="{% url 'collect:delete-participation' participate.id %}">승인</a>
+                {% else %}
+                  <a href="{% url 'collect:delete-participation' participate.id %}" style="color:rgb(48, 66, 146)">취소</a>
                 {% endif %}
-                {% endfor %}
-            </tbody>
+              </td>
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
 
-        </table>         
-    </div>
+    </table>     
+  </div>
+  
+  
+  <div id="taskDiv2">
     
-    
-    <div id="taskDiv2">
-        
-        <p class="taskInfoText">참여 중인 태스크 목록</p>
+    <p class="taskInfoText">참여 중인 태스크 목록</p>
 
-        <table class="taskInfoTable">
-            <thead>
-                <tr>
-                    <th style="background-color:rgb(17, 30, 70)">태스크 이름</th>
-                    <th style="background-color:rgb(17, 30, 70)">제출한 파일 수</th>
-                    <th style="background-color:rgb(17, 30, 70)">상세 조회</th>
-                </tr>
-            </thead>
-            <tbody>
-              {% for participate in participations %}
-                {% if participate.admission %}
-                <td><a href="{% url 'collect:task-detail' participate.task.id %}" style="color:rgb(48, 66, 146)">{{ participate.task.name }}</a></td>
-                <td>{{ participate.submit_count }}</td>
-                <td><a href="{% url 'collect:submitted-parsedfiles' participate.task.id %}" style="color:rgb(48, 66, 146)">상세조회</a></td>
-                {% endif %}
-                {% endfor %}
-            </tbody>
+    <table class="taskInfoTable">
+      <thead>
+        <tr>
+          <th style="background-color:rgb(17, 30, 70)">태스크 이름</th>
+          <th style="background-color:rgb(17, 30, 70)">제출한 파일 수</th>
+          <th style="background-color:rgb(17, 30, 70)">상세 조회</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for participate in participations %}
+          {% if participate.admission %}
+            <tr>
+              <td><a href="{% url 'collect:task-detail' participate.task.id %}" style="color:rgb(48, 66, 146)">{{ participate.task.name }}</a></td>
+              <td>{{ participate.submit_count }}</td>
+              <td><a href="{% url 'collect:submitted-parsedfiles' participate.task.id %}" style="color:rgb(48, 66, 146)">상세조회</a></td>
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
 
-        </table>         
-    
-    </div>
+    </table>     
+  
+  </div>
 </div>
 {% endblock main_content %}
 
 
 
    
-    
   
-        
+  
+    
