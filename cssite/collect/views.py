@@ -185,7 +185,7 @@ class ParticipationList(View):
 
 # 제출자: 태스크 참여 취소
 def delete_participation(request, pk):
-    if not request.user.is_superuser:
+    if request.user.account.role == '제출자':
         participation = get_object_or_404(Participation, pk=pk)
         participation.delete()
         return redirect(reverse('collect:participations'))
@@ -193,7 +193,7 @@ def delete_participation(request, pk):
 
 # 관리자: 태스크 참여 승인
 def manager_acknowledge_participation(request, part_id):
-    if request.user.is_superuser:
+    if request.user.account.role == '관리자':
         task = Participation.objects.filter(id=part_id)[0].task
         participation = get_object_or_404(Participation, pk=part_id)
         participation.admission = True
@@ -203,7 +203,7 @@ def manager_acknowledge_participation(request, part_id):
 
 # 관리자: 태스크 참여 거절
 def manager_delete_participation(request, part_id):
-    if request.user.is_superuser:
+    if request.user.account.role == '관리자':
         task = Participation.objects.filter(id=part_id)[0].task
         participation = get_object_or_404(Participation, pk=part_id)
         participation.delete()
