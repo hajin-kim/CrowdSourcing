@@ -77,14 +77,14 @@
         <!--순석 추가코드-->
         <!-- 아이디 비밀번호 찾기 버튼, 회원가입 버튼 -->
         <div class="loginSubDiv">
-         <a href="javascript:showModalDiv(0);clearModalInput(0);" class="loginSubButton">
-           FORGOT PASSWORD?
-         </a>
+          <a href="javascript:showModalDiv(0);clearModalInput(0);" class="loginSubButton">
+            비밀번호 찾기<!-- FORGOT PASSWORD? -->
+          </a>
         </div>
         <div class="loginSubDiv">
           <a href="javascript:showModalDiv(1);clearModalInput(0);" class="loginSubButton">
-            CREATE AN ACCOUNT
-           </a>
+            회원가입<!-- CREATE AN ACCOUNT -->
+          </a>
         </div>
 
         <!-- 모달 팝업 -->
@@ -92,8 +92,8 @@
           <div class = "modalInputDiv">
             <p class = "modalText" style="top:30px; left:30px;" >FIND PASSWORD</p>
             <p class = "modalText" style="top:65px; left:35px; font-size:15px">
-              Forgot your password? don't worry!</p>
-              <div class="modalExitButton" style="top:35px; right:30px;" onclick="hideModalDiv(0);clearModalInput(1);">X</div>
+              Forgot your password? Don't worry!</p>
+            <div class="modalExitButton" style="top:35px; right:30px;" onclick="hideModalDiv(0);clearModalInput(0);">X</div>
             <form action="/findPassword" method="post" autocomplete="off">
               <input type="text" class="modalInputForm" name="userid" style="top:130px;" placeholder="ID를 입력하세요" required>
               <input type="text" class="modalInputForm" name="username" style="top:165px;" placeholder="이름을 입력하세요" required>
@@ -114,7 +114,7 @@
             <p class = "modalText" style="top:65px; left:35px; font-size:15px"> Welcome, new guest!</p>
             
             <strong>{{ error }}</strong>
-              <div class="modalExitButton" style="top:35px; right:30px;" onclick="hideModalDiv(0);clearModalInput(1)">X</div>
+            <div class="modalExitButton" style="top:35px; right:30px;" onclick="hideModalDiv(1);clearModalInput(1)">X</div>
             <form action="{% url 'collect:signup' %}" method="post">
             {% csrf_token %}
               <input type="text" class="modalInputForm" name="username" style="top:110px;" placeholder="ID를 입력하세요" required>

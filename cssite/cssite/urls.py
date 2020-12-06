@@ -30,11 +30,11 @@ urlpatterns = [
     path('task/part/<int:part_id>/del', manager_delete_participation, name='delete participation'),
     path('task/create/', createTask, name='create task'),
     path('task/<int:task_id>/parsedfiles/', parsedfile_list, name='parsedfile list'),
-    path('tasks/<int:task_id>/parsedfiles/<int:user_id>/',
+    path('task/<int:task_id>/parsedfiles/<int:user_id>/',
          submittedfile_list, name='submitted-parsedfiles'),
 
-    path('parsedfile/<int:file_id>/graders/', grader_list, name='grader list'),
-    path('parsedfile/<int:file_id>/grader/<int:account_id>/', allocate_file, name='allocate file'),
+    path('task/<int:task_id>/parsedfile/<int:file_id>/grader/', grader_list, name='grader list'),
+    path('task/<int:task_id>/parsedfile/<int:file_id>/grader/<int:account_id>/', allocate_file, name='allocate file'),
 
     path('task/<int:task_id>/attribute/',
          listAttributes, name='list attributes'),
@@ -47,6 +47,7 @@ urlpatterns = [
          showDerivedSchema, name='show derived schema'),
     path('task/<int:task_id>/derived_schema/create/',
          createDerivedSchema, name='create derived schema'),
+         
     path('task/<int:task_id>/derived_schema/<int:schema_id>/pair/',
          listMappingPairs, name='list mapping pairs'),
     path('task/<int:task_id>/derived_schema/<int:schema_id>/pair/create',

@@ -56,29 +56,29 @@ H.K.
               <option value="">--</option>
               <option value="남성">남성</option>
               <option value="여성">여성</option>
-           </select>
+            </select>
 
-           <p class="userInfoText" style="top:165px;">역할</p>
-           <select class="userInfoInput" name="role" style="top:165px;">
-            <option value="">--</option>
-            <option value="제출자">제출자</option>
-            <option value="평가자">평가자</option>
-           </select>
-            
-           <p class="userInfoText" style="top:225px;">생년월일</p>
-           <input class="userInfoInput" type="date" name="birth1" style="top:205px;">
-           <p class="userInfoText" style="top:230px; left:40%; font-size:30px">~</p>
-           <input class="userInfoInput" type="date" name="birth2" style="top:240px;right:15%;">
+            <p class="userInfoText" style="top:165px;">역할</p>
+            <select class="userInfoInput" name="role" style="top:165px;">
+              <option value="">--</option>
+              <option value="제출자">제출자</option>
+              <option value="평가자">평가자</option>
+            </select>
+              
+            <p class="userInfoText" style="top:225px;">생년월일</p>
+            <input class="userInfoInput" type="date" name="birth1" style="top:205px;">
+            <p class="userInfoText" style="top:230px; left:40%; font-size:30px">~</p>
+            <input class="userInfoInput" type="date" name="birth2" style="top:240px;right:15%;">
 
-           <p class="userInfoText" style="top:280px;">참여 태스크</p>
-           <select class="userInfoInput" name="taskname" style="top:280px;">
-            <option value="">--</option>
-            {% for task in tasks %}
-            <option value="{{ task.name }}">{{ task.name }}</option>
-            {% endfor %}
-           </select>
-          <div class="initButton" style="top:330px;" onclick="clearSearchInput(0);">초기화</div>
-          <input class="searchButton" type="submit" value="검색" style="top:330px">
+            <p class="userInfoText" style="top:280px;">참여 태스크</p>
+            <select class="userInfoInput" name="taskname" style="top:280px;">
+              <option value="">--</option>
+              {% for task in tasks %}
+              <option value="{{ task.name }}">{{ task.name }}</option>
+              {% endfor %}
+            </select>
+            <div class="initButton" style="top:330px;" onclick="clearSearchInput(0);">초기화</div>
+            <input class="searchButton" type="submit" value="검색" style="top:330px">
           </form>
         </div>
         <div id="searchFoldButton" onclick="foldSearchDiv()"> ◀ </div>
@@ -97,21 +97,21 @@ H.K.
           </thead>
           <tbody>
             {% for account in accounts %}
-             {% if account.role != "관리자" %}
-             <tr>
-               <td>{{ account.role }}</td>
-               <td> {{ account.user.username }}</td>
-               <td>{{ account.birth }}</td>
-               <td>{{ account.gender }}</td>
-               <td>{% for participation in account.participations.all %}
-                {% if participation.admission %}
-                    {{ participation.task.name }} 
-                {% endif %}
-                 {% endfor %}</td>
-               <td> <a href="{% url 'collect:user-detail' account.user.id %}" style="color:rgb(48, 66, 146)">상세조회</a> </td>
-             </tr>
-              
-            {% endif %}
+              {% if account.role != "관리자" %}
+                <tr>
+                  <td>{{ account.role }}</td>
+                  <td> {{ account.user.username }}</td>
+                  <td>{{ account.birth }}</td>
+                  <td>{{ account.gender }}</td>
+                  <td>
+                    {% for participation in account.participations.all %}
+                      {% if participation.admission %}
+                        {{ participation.task.name }} 
+                      {% endif %}
+                    {% endfor %}</td>
+                  <td> <a href="{% url 'collect:user-detail' account.user.id %}" style="color:rgb(48, 66, 146)">상세조회</a> </td>
+                </tr>
+              {% endif %}
             {% endfor %}
           </tbody>
 

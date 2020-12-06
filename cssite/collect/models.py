@@ -115,7 +115,7 @@ class ParsedFile(models.Model):
     submitter = models.ForeignKey(
         Account, on_delete=models.CASCADE, related_name='parsed_submits', verbose_name='제출자')
     grader = models.ForeignKey(
-        Account, on_delete=models.CASCADE, related_name='parsed_grades', verbose_name='평가자', null=True, blank=True)
+        Account, on_delete=models.SET_NULL, related_name='parsed_grades', verbose_name='평가자', null=True, blank=True)
     task = models.ForeignKey(
         Task, on_delete=models.CASCADE, related_name='parsedfiles', verbose_name='태스크')
     submit_number = models.IntegerField('제출 회차', null=True)
@@ -167,5 +167,5 @@ class ParsedFile(models.Model):
         return file name
         """
         # return self.file_parsed.name.replace('data_parsed/', '')
-        return os.path.basename(self.file_original.name)
+        return os.path.basename(self.file_parsed.name)
 

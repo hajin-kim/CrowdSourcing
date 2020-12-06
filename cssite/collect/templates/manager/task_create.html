@@ -6,6 +6,7 @@
 
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
+    {% comment %}
     <!-- 순석 작업하던 부분
     <p class="taskCreateSubText">태스크 이름</p>
     <input class="taskCreateInputForm" type="taskname" style="top:0px;">
@@ -25,6 +26,7 @@
     
     <input class="taskCreateButton" type="submit" value="생성" style="top:140px">
     -->
+    {% endcomment %}
 
     {{ create_task_form }}
     <input class="taskCreateButton" type="submit" value="생성" style="top:140px">
