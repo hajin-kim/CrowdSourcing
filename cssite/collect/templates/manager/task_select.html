@@ -3,7 +3,7 @@
 <div id="taskSelectMainDiv">
   <p class="taskCreateText">{{ task.name }}</p>
  
-  <div id="taskSelectInfoDiv">
+  <div id="taskSelectInfoDiv"  style="overflow:auto;">
     <p class="taskCreateText" style="font-size:20px;">태스크 정보</p>
     
     <table class="taskCreateTable">
@@ -27,20 +27,22 @@
       </tbody>
     </table>
 
-    <a class="taskButton" href="./download" style="width:15%;font-size:14px;top:160px;left:20px;">데이터 다운로드</a>
-    <a class="taskButton" href="{% url 'parsedfile list' task.id %}" style="width:20%;font-size:14px;top:160px;left:175px;">파싱된 파일 관리</a>
-    <a class="taskButton" href="./attribute" style="width:15%;font-size:14px;top:160px;left:365px">속성 관리</a>
-    <a class="taskButton" href="./derived_schema" style="width:15%;font-size:14px;top:160px;left:515px;">파생 스키마 관리</a>
+  </div>
+
+  <div id="taskSelectButtonDiv">
+    <a class="taskButton" href="./download" style="width:15%;font-size:14px;top:40%;left:20px;">데이터 다운로드</a>
+    <a class="taskButton" href="{% url 'parsedfile list' task.id %}" style="width:20%;font-size:14px;top:40%;left:175px;">파싱된 파일 관리</a>
+    <a class="taskButton" href="./attribute" style="width:15%;font-size:14px;top:40%;left:365px">속성 관리</a>
+    <a class="taskButton" href="./derived_schema" style="width:15%;font-size:14px;top:40%;left:515px;">파생 스키마 관리</a>
     {% if task.activation_state %}
-      <a class="taskButton" href="./end" style="width:15%;font-size:14px;top:160px;left:660px;">수집 종료하기</a>
+      <a class="taskButton" href="./end" style="width:15%;font-size:14px;top:40%;left:660px;">수집 종료하기</a>
     {% else %}
-      <p class="taskButton" style="background-color: #144680;color:#999;width:15%;font-size:14px;top:160px;left:660px;">수집 종료됨</p>
+      <p class="taskButton" style="background-color: #144680;color:#999;width:15%;font-size:14px;top:40%;left:660px;">수집 종료됨</p>
     {% endif %}
-    
-
-
 
   </div>
+
+
 
   <div id="taskSelectAttributeDiv" style="text-align:center; overflow:auto;">
     <p class="taskCreateText" style="font-size:20px;">속성 목록</p>
