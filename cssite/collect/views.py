@@ -678,14 +678,16 @@ def createTask(request):
     """
 
     form = None
-    task = None
     if request.method == 'POST':
         form = CreateTask(request.POST, request.FILES)
         if form.is_valid():
-            form = form.save(commit=False) # 중복 DB save를 방지
-            # task = form.save()
-            task.activation_state = True    # TODO: basically task should be disabled when just created
-            task.save()
+            # if not Task.objects.filter(name=form.name):
+            # task = form.save(commit=False) # 중복 DB save를 방지
+            form.save()
+            # task.activation_state = True
+            # TODO: basically task should be disabled when just created
+            # TODO: now this is in forms.py
+            # task.save()
 
             # return render(request, 'manager/done_task.html', {})
             return redirect('list tasks')

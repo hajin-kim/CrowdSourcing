@@ -60,6 +60,7 @@ class CreateTask(forms.ModelForm):
 
     def save(self, commit=True):
         self.instance = Task(**self.cleaned_data)
+        self.instance.activation_state = True
 
         if commit:
             self.instance.save()
