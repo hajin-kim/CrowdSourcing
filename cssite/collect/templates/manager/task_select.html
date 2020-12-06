@@ -28,9 +28,15 @@
     </table>
 
     <a class="taskButton" href="./download" style="top:160px;left:20px;">데이터 다운로드</a>
-    <a class="taskButton" href="{% url 'parsedfile list' task.id %}" style="width:25%;top:160px;left:210px;">파싱 데이터 시퀀스 파일</a>
+    <a class="taskButton" href="{% url 'parsedfile list' task.id %}" style="width:25%;top:160px;left:210px;">파싱된 파일 관리</a>
     <a class="taskButton" href="./attribute" style="top:160px;left:435px">속성 관리</a>
     <a class="taskButton" href="./derived_schema" style="top:160px;left:620px;">파생 스키마 관리</a>
+    {% if task.activation_state %}
+      <a class="taskButton" href="./end" style="top:160px;left:700px;">수집 종료하기</a>
+    {% else %}
+      <a class="taskButton" style="color:#999;top:160px;left:700px;">수집 종료됨</a>
+    {% endif %}
+    
 
 
 

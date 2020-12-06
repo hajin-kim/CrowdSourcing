@@ -682,8 +682,8 @@ def createTask(request):
     if request.method == 'POST':
         form = CreateTask(request.POST, request.FILES)
         if form.is_valid():
-            # form = form.save(commit=False) # 중복 DB save를 방지
-            task = form.save()
+            form = form.save(commit=False) # 중복 DB save를 방지
+            # task = form.save()
             task.activation_state = True    # TODO: basically task should be disabled when just created
             task.save()
 
@@ -710,20 +710,38 @@ def createTask(request):
     })
 
 
+def endTask(request, task_id):
+    """
+    docstring
+    """
+    
+    task = Task.objects.get(id=task_id)
+    task.activation_state = False
+    task.save()
+
+    return redirect('show task', task_id=task_id)
+
+
 """
 view functions for attribute
 """
-def listAttributes(request, task_id):
+def listAttributes(request, task_id, error_message=None):
     """
     docstring
     """
     task = Task.objects.get(id=task_id)
     attributes = generateListString(SchemaAttribute.objects.filter(task=task))
-    return render(request, 'manager/attribute_list.html', {
+
+    context = {
         'task_name': task.name,
         'task_id': task_id,
         'list_of_attributes': attributes,
-    })
+    }
+
+    # prohibit duplication
+    if error_message:
+        context.update(error_message)
+    return render(request, 'manager/attribute_list.html', context)
 
 
 def createAttribute(request, task_id):
@@ -736,12 +754,23 @@ def createAttribute(request, task_id):
     #     return HttpResponse("<h2>태스크가 활성화되어 있습니다!</h3>")
 
     if request.method == 'POST':
-        # form = form.save(commit=False) # 중복 DB save를 방지
+        attr = request.POST['attr']
+
+        # prohibit duplication
+        error_message = {}
+        if SchemaAttribute.objects.filter(
+            task=task,
+            attr=attr
+        ):
+            error_message.update({'error_at_attr': "속성이 이미 존재합니다."})
+        if error_message:
+            return listAttributes(request, task_id, error_message)
+        
+        # create
         attribute = SchemaAttribute(
             task=task,
-            attr=request.POST['attr']
+            attr=attr
         )
-        # attribute.task = task
         attribute.save()
 
     return redirect('list attributes', task_id=task_id)
@@ -749,17 +778,23 @@ def createAttribute(request, task_id):
 """
 view functions for derived schema
 """
-def listDerivedSchemas(request, task_id):
+def listDerivedSchemas(request, task_id, error_message=None):
     """
     docstring
     """
     task = Task.objects.get(id=task_id)
     derived_schemas = MappingInfo.objects.filter(task=task)
-    return render(request, 'manager/derived_schema_list.html', {
+
+    context = {
         'task_id': task_id,
         'task_name': task.name,
         'list_of_derived_schemas': derived_schemas,
-    })
+    }
+
+    # prohibit duplication
+    if error_message:
+        context.update(error_message)
+    return render(request, 'manager/derived_schema_list.html', context)
 
 
 def showDerivedSchema(request, task_id, schema_id):
@@ -783,12 +818,24 @@ def createDerivedSchema(request, task_id):
     """
     docstring
     """
-    task = Task.objects.filter(id=task_id)[0]
-    schema = None
+    task = Task.objects.get(id=task_id)
     if request.method == 'POST':
+        derived_schema_name=request.POST['derived_schema_name']
+        
+        # prohibit duplication
+        error_message = {}
+        if MappingInfo.objects.filter(
+            task=task,
+            derived_schema_name=derived_schema_name,
+        ):
+            error_message.update({'error_at_derived_schema_name': "파생 스키마가 이미 존재합니다."})
+        if error_message:
+            return listDerivedSchemas(request, task_id, error_message)
+
+        # create
         schema = MappingInfo(
             task=task,
-            derived_schema_name=request.POST['derived_schema_name']
+            derived_schema_name=derived_schema_name
         )
         schema.save()
 
@@ -800,25 +847,29 @@ view functions for mapping pairs
 """
 
 
-def listMappingPairs(request, task_id, schema_id):
+def listMappingPairs(request, task_id, schema_id, error_message=None):
     """
     docstring
     """
     task = Task.objects.get(id=task_id)
     derived_schema = MappingInfo.objects.get(id=schema_id, task=task)
 
-    mapping_pairs = generateListString(
-        MappingPair.objects.filter(mapping_info=derived_schema))
+    mapping_pairs = generateListString(MappingPair.objects.filter(mapping_info=derived_schema))
     schema_attribute_list = SchemaAttribute.objects.filter(task=task)
 
-    return render(request, 'manager/mapping_pair_list.html', {
+    context = {
         'task_id': task_id,
         'task_name': task.name,
         'schema_id': schema_id,
         'schema_name': derived_schema.derived_schema_name,
         'schema_attribute_list': schema_attribute_list,
         'list_of_mapping_pairs': mapping_pairs,
-    })
+    }
+
+    # prohibit duplication
+    if error_message:
+        context.update(error_message)
+    return render(request, 'manager/mapping_pair_list.html', context)
 
 
 def createMappingPair(request, task_id, schema_id):
@@ -829,10 +880,29 @@ def createMappingPair(request, task_id, schema_id):
     derived_schema = MappingInfo.objects.get(id=schema_id, task=task)
 
     if request.method == 'POST':
+        schema_attribute = SchemaAttribute.objects.get(task=task, attr=request.POST['attr'])
+        parsing_column_name = request.POST['parsing_column_name']
+        
+        # prohibit duplication
+        error_message = {}
+        if MappingPair.objects.filter(
+            mapping_info=derived_schema,
+            parsing_column_name=parsing_column_name,
+        ):
+            error_message.update({'error_at_parsing_column_name': "파생 스키마의 컬럼 이름이 이미 매핑되었습니다."})
+        if MappingPair.objects.filter(
+            mapping_info=derived_schema,
+            schema_attribute=schema_attribute,
+        ):
+            error_message.update({'error_at_schema_attribute': "원본 스키마의 컬럼이 이미 매핑되었습니다."})
+        if error_message:
+            return listMappingPairs(request, task_id, schema_id, error_message)
+        
+        # create
         mapping_pair = MappingPair(
             mapping_info=derived_schema,
-            schema_attribute=SchemaAttribute.objects.get(task=task, attr=request.POST['attr']),
-            parsing_column_name=request.POST['parsing_column_name'],
+            schema_attribute=schema_attribute,
+            parsing_column_name=parsing_column_name,
         )
         mapping_pair.save()
 

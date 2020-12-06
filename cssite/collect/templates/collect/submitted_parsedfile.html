@@ -38,36 +38,44 @@
     
     </table>
   </div>
-  <div id="taskUploadDivSubmit" style="width:600px;height:300px;">
-    <p class="taskParseText">파일 업로드</p>
-    <form class="form-file-upload" action="{% url 'collect:submitted-parsedfiles' task.id %}" method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-      {% comment %}
-      'derived_schema', 
-      'file_original', 
-      'start_date', 
-      'end_date' 
-      {% endcomment %}
-      
-      <p class="fileUploadText" style="top:225px;">파일</p>
-      <input class="fileUploadInput" type="file" name="file_original" style="top:205px;" required>
-      {% comment %} tag: accept=.xls,.xlsx,.txt,.csv,.html,.json {% endcomment %}
+  {% if task.activation_state %}
+    <div id="taskUploadDivSubmit" style="width:600px;height:300px;">
+      <p class="taskParseText">파일 업로드</p>
+      <form class="form-file-upload" action="{% url 'collect:submitted-parsedfiles' task.id %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% comment %}
+        'derived_schema', 
+        'file_original', 
+        'start_date', 
+        'end_date' 
+        {% endcomment %}
+        
+        <p class="fileUploadText" style="top:225px;">파일</p>
+        <input class="fileUploadInput" type="file" name="file_original" style="top:205px;" required>
+        {% comment %} tag: accept=.xls,.xlsx,.txt,.csv,.html,.json {% endcomment %}
 
-      <p class="fileUploadText" style="top:225px;">스키마</p>
-      <select class="fileUploadInput" name="derived_schema" style="top:280px;" required>
-        {% for schema in schemas %}
-          <option value="{{ schema.derived_schema_name }}">{{ schema.derived_schema_name }}</option>
-        {% endfor %}
-      </select>
+        <p class="fileUploadText" style="top:225px;">스키마</p>
+        <select class="fileUploadInput" name="derived_schema" style="top:280px;" required>
+          {% for schema in schemas %}
+            <option value="{{ schema.derived_schema_name }}">{{ schema.derived_schema_name }}</option>
+          {% endfor %}
+        </select>
 
-      <p class="fileUploadText" style="top:225px;">데이터 수집 기간</p>
-      <input class="fileUploadInput" type="date" name="start_date" style="top:205px;" required>
-      <p class="fileUploadText" style="top:225px;">~</p>
-      <input class="fileUploadInput" type="date" name="end_date" style="top:205px;" required>
+        <p class="fileUploadText" style="top:225px;">데이터 수집 기간</p>
+        <input class="fileUploadInput" type="date" name="start_date" style="top:205px;" required>
+        <p class="fileUploadText" style="top:225px;">~</p>
+        <input class="fileUploadInput" type="date" name="end_date" style="top:205px;" required>
 
-      <button class="fileUploadButton" type="submit" style="top:150px;">파일 업로드</button>
-    </form>
-  </div>
+        <button class="fileUploadButton" type="submit" style="top:150px;">파일 업로드</button>
+      </form>
+    </div>
+  {% else %}
+    <h4 id="taskUploadDivSubmit" style="text-align:center;">
+      <br>
+      태스크가 종료되었습니다.<br>
+      더 이상 데이터를 수집하지 않습니다.
+    </h4>
+  {% endif %}
 
 </div>
 

@@ -17,6 +17,8 @@
       <p class="createAttributeText" style="top:225px;">컬럼 이름</p>
       <input class="createAttributeInput" type="text" name="attr" style="top:130px;" required>
       {% comment %} tag: placeholder="ID를 입력하세요" {% endcomment %}
+      <strong>{{ error_at_attr }}</strong>
+
 
       <button type="submit">생성</button>
     </form>

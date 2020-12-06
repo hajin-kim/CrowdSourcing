@@ -15,6 +15,7 @@
       <p class="createSchemaText" style="top:225px;">스키마 이름</p>
       <input class="createSchemaInput" type="text" name="derived_schema_name" style="top:130px;" required>
       {% comment %} tag: placeholder="ID를 입력하세요" {% endcomment %}
+      <strong>{{ error_at_derived_schema_name }}</strong>
 
       <button type="submit">생성</button>
     </form>

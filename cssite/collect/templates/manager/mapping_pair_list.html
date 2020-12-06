@@ -22,10 +22,12 @@
           <option value="{{ schema_attribute.attr }}">{{ schema_attribute.attr }}</option>
         {% endfor %}
       </select>
+      <strong>{{ error_at_schema_attribute }}</strong>
 
       <p class="createMappingPairText" style="top:225px;">파생 스키마의 컬럼 이름</p>
       <input class="createMappingPairInput" type="text" name="parsing_column_name" style="top:130px;" required>
       {% comment %} tag: placeholder="ID를 입력하세요" {% endcomment %}
+      <strong>{{ error_at_parsing_column_name }}</strong>
 
       <button type="submit">생성</button>
     </form>
