@@ -1,11 +1,11 @@
 {% extends 'collect/submitter.html' %}
 {% block main_content %}
 
-<div id="taskParseMainDivSubmit" style="height:700px;">
+<div id="taskParseMainDivSubmit" style="width:800px; height:700px;">
   <p class="taskListText">제출한 파일 목록</p>
   <pre class="taskParseText">태스크 이름 : {{ task.name }}    저장된 Tuple 수 : {{ total_tuple }}</pre>
 
-  <div id="taskParseDivSubmit">
+  <div id="taskParseDivSubmit" style="width:800px;overflow:auto;">
     <table class="taskListTable">
       <thead>
         <tr>
@@ -39,7 +39,7 @@
     </table>
   </div>
   {% if task.activation_state %}
-    <div id="taskUploadDivSubmit" style="width:600px;height:300px;">
+    <div id="taskUploadDivSubmit" style="width:800px;height:300px;bottom:100px;">
       <p class="taskParseText">파일 업로드</p>
       <form class="form-file-upload" action="{% url 'collect:submitted-parsedfiles' task.id %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
@@ -50,23 +50,23 @@
         'end_date' 
         {% endcomment %}
         
-        <p class="fileUploadText" style="top:225px;">파일</p>
-        <input class="fileUploadInput" type="file" name="file_original" style="top:205px;" required>
+        <p class="fileUploadText" style="top:50px;">파일</p>
+        <input class="fileUploadInput" type="file" name="file_original" style="top:50px;" required>
         {% comment %} tag: accept=.xls,.xlsx,.txt,.csv,.html,.json {% endcomment %}
 
-        <p class="fileUploadText" style="top:225px;">스키마</p>
-        <select class="fileUploadInput" name="derived_schema" style="top:280px;" required>
+        <p class="fileUploadText" style="top:90px;">스키마</p>
+        <select class="fileUploadInput" name="derived_schema" style="top:90px;" required>
           {% for schema in schemas %}
             <option value="{{ schema.derived_schema_name }}">{{ schema.derived_schema_name }}</option>
           {% endfor %}
         </select>
 
-        <p class="fileUploadText" style="top:225px;">데이터 수집 기간</p>
-        <input class="fileUploadInput" type="date" name="start_date" style="top:205px;" required>
-        <p class="fileUploadText" style="top:225px;">~</p>
-        <input class="fileUploadInput" type="date" name="end_date" style="top:205px;" required>
+        <p class="fileUploadText" style="top:130px;">데이터 수집 기간</p>
+        <input class="fileUploadInput" type="date" name="start_date" style="top:130px;" required>
+        <p class="fileUploadText" style="font-size:30px;top:150px;left:455px;">~</p>
+        <input class="fileUploadInput" type="date" name="end_date" style="left:480px;top:160px;" required>
 
-        <button class="fileUploadButton" type="submit" style="top:150px;">파일 업로드</button>
+        <button class="fileUploadButton" type="submit" style="top:220px;">파일 업로드</button>
       </form>
     </div>
   {% else %}
