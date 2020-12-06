@@ -309,6 +309,9 @@ def parsedFileListAndUpload(request, pk):
         original_file_path = os.path.join(settings.MEDIA_ROOT, 
             parsedFile.file_original.name)
         
+        base_path = os.path.join(settings.MEDIA_ROOT, parsedFile.file_original.name.replace('data_original/', 'data_parsed/'))
+        parsed_file_path = os.path.splitext(base_path)[0] + '.csv'
+
         # get parsing information into a dictionary
         # { 파싱전: 파싱후 }
         mapping_from_to = {
@@ -334,7 +337,7 @@ def parsedFileListAndUpload(request, pk):
         if original_file_type[0] in (
                 'text/csv',
                 'text/plain'
-            ):
+            ) or original_file_path.endswith('.csv'):
             # load csv file from the server-stored file
             # assume that header exists
             df = pd.read_csv(original_file_path, header=0, na_values=('', '\n'), keep_default_na=True)
@@ -348,7 +351,8 @@ def parsedFileListAndUpload(request, pk):
                 'application/x-dos_ms_excel',
                 'application/xls',
                 'application/x-xls',
-            ):
+            ) or original_file_path.endswith('.xlsx') \
+              or original_file_path.endswith('.xls'):
             df = pd.read_excel(original_file_path, header=0, na_values=('', ), keep_default_na=True)
         elif original_file_type[0] == 'application/json':
             df = pd.read_json(original_file_path)
@@ -356,6 +360,7 @@ def parsedFileListAndUpload(request, pk):
             df = pd.read_html(original_file_path, na_values=('', ), keep_default_na=True)
         
         if df is None:
+            parsedFile.delete()
             return HttpResponse("제출 error (file empty 등)")
 
         # parse
@@ -391,9 +396,7 @@ def parsedFileListAndUpload(request, pk):
         print(df)
 
         # save the parsed file
-        # parsed_file_path = os.path.join(settings.DATA_PARSED, parsedFile.__str__()) 
-        base_path = os.path.join(settings.MEDIA_ROOT, parsedFile.file_original.name.replace('data_original/', 'data_parsed/'))
-        parsed_file_path = os.path.splitext(base_path)[0] + '.csv'
+        # parsed_file_path = os.path.join(settings.DATA_PARSED, parsedFile.__str__())
         while os.path.exists(parsed_file_path):
             parsed_file_path = os.path.splitext(base_path)[0] + '_' + ''.join([choice(ascii_lowercase) for _ in range(randint(5, 8))]) + '.csv'
         df.to_csv(parsed_file_path, index=False)
