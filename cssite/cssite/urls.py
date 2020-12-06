@@ -17,6 +17,10 @@ from django.contrib import admin
 from django.urls import path, include
 from collect.views import *
 
+# insecure media applying
+from django.views.static import serve
+from django.urls import re_path
+
 urlpatterns = [
     path('', index, name='index'),
 
@@ -54,5 +58,7 @@ urlpatterns = [
          listMappingPairs, name='list mapping pairs'),
     path('task/<int:task_id>/derived_schema/<int:schema_id>/pair/create',
          createMappingPair, name='create mapping pair'),
-
+     
+    # insecure media applying
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root':settings.MEDIA_ROOT}),
 ]
