@@ -276,9 +276,15 @@ def parsedFileListAndUpload(request, pk):
         submitter = Account.objects.filter(user=user)[0]
         # grader_pk = 2
         # grader = Account.objects.filter(id=grader_pk)[0]
-        grader = Account.objects.filter(role="평가자")[:]
         grader = None
-            
+
+        # random grader
+        graders = Account.objects.filter(role="평가자")
+        grading_end_date = None
+        if graders:
+            grader = choice(graders)
+            grading_end_date = date.today() + timedelta(weeks=1)
+        
         # check if the user is participating in the task
         participation = Participation.objects.filter(
             account=submitter, task=task)
@@ -292,6 +298,7 @@ def parsedFileListAndUpload(request, pk):
             task=task,
             submitter=submitter,
             grader=grader,
+            grading_end_date=grading_end_date,
             derived_schema=mapping_info,
             start_date=request.POST['start_date'],
             end_date=request.POST['end_date'],
@@ -355,24 +362,32 @@ def parsedFileListAndUpload(request, pk):
         print(df.columns)
         print('keys:', mapping_from_to.keys())
         print('values:', mapping_from_to.values())
+        mapping = {}
         for key in df.columns:
-            if str(key) in mapping_from_to.keys():
-                df.rename(columns={key: mapping_from_to[str(key)]}, inplace=True)
-                print("#", "key", key, "changed to", mapping_from_to[str(key)])
+            if key in mapping_from_to.keys():
+                mapping.update({key: mapping_from_to[key]})
+                print("#", "key", key, "changed to", mapping_from_to[key])
+            elif str(key) in mapping_from_to.keys():
+                mapping.update({key: mapping_from_to[str(key)]})
+                print("#", "non-str key", key, "changed to", mapping_from_to[str(key)])
             else:
                 df.drop([key], axis='columns', inplace=True)
                 df.drop([str(key)], axis='columns', inplace=True)
                 print("#", "key", key, "a.k.a.", str(key), "is dropped")
         
-        i = 0
+        df.rename(columns=mapping, inplace=True)
+
+        attributes = [i.attr.__str__() for i in SchemaAttribute.objects.filter(task=task)]
+        print("attributes:", attributes)
+        # i = 0
         for key in mapping_from_to.values():
-            if str(key) not in df.columns:
-                df.insert(loc=i, column=key, value=None, allow_duplicates=False)
+            if key not in attributes:
+                df.insert(column=key, value=None, allow_duplicates=True)
                 print("#", "key", key, "is inserted")
             # df.insert(loc=i, column=key, value=None)
-            i += 1
+            # i += 1
 
-        df = df[mapping_from_to.values()]
+        # df = df[mapping_from_to.values()]
         print(df)
 
         # save the parsed file
