@@ -255,10 +255,10 @@ def syncTotalTableFile(task):
     if not os.path.exists(settings.JOINED_PATH_DATA_INTEGRATED):
         os.mkdir(settings.JOINED_PATH_DATA_INTEGRATED)
     
-    download_file_path = os.path.join(settings.JOINED_PATH_DATA_INTEGRATED, task.name) + ".csv"
+    download_file_path = os.path.join(settings.JOINED_PATH_DATA_INTEGRATED, task.name) + ".xlsx"
     df = pd.concat(file_list, axis=0, ignore_index=True)
     num_total_tuples = len(df)
-    df.to_csv(download_file_path, header=attr, index=True)
+    df.to_excel(download_file_path, header=attr, index=True)
 
     return download_file_path, num_total_tuples
 
@@ -642,13 +642,13 @@ def downloadAllFiles(request, task_id):
 
     download_file_path, _ = syncTotalTableFile(task)
 
-    file_name = urllib.parse.quote((task.name+'.csv').encode('utf-8'))
+    file_name = urllib.parse.quote((task.name+'.xlsx').encode('utf-8'))
     
     if download_file_path is None:
         return redirect('show task', task_id=task_id)
     if os.path.exists(download_file_path):
         with open(download_file_path, 'rb') as fh:
-            response = HttpResponse(fh.read(), content_type='text/csv')
+            response = HttpResponse(fh.read(), content_type='application/vnd.ms-excel')
             # response = HttpResponse(fh.read(), content_type=mimetypes.guess_type(download_file_path)[0])
             response['Content-Disposition'] = 'attachment;filename*=UTF-8\'\'%s' % file_name
             return response
